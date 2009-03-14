@@ -1,0 +1,29 @@
+#!/usr/bin/python
+
+import sys
+import Image, ImageDraw
+
+def vcat(outf, infs):
+    in_imgs = []
+    h = 0
+    w = 0
+    m = None
+    for inf in infs:
+        img = Image.open(inf)
+        if not m:
+            m = img.mode
+        (iw, ih) = img.size
+        if iw > w:
+            w = iw
+        h = h + ih
+        in_imgs.append(img)
+    oimg = Image.new(m, (w, h));
+    ch = 0
+    for img in in_imgs:
+        (iw, ih) = img.size
+        oimg.paste(img, (0, ch))
+        ch += ih
+    oimg.save(outf)
+
+if __name__ == '__main__':
+    vcat(sys.argv[1], sys.argv[2:])

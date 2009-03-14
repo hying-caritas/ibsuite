@@ -1,0 +1,325 @@
+#!/usr/bin/python
+# -*- Mode: Python -*-
+# vi:si:et:sw=4:sts=4:ts=4
+
+"""
+This program is under license GPL2 (see LICENSE file)
+
+Copyright: Huang Ying <huang.ying.caritas@gmail.com> 2008
+	   Michele Baldessari <michele@pupazzo.org>
+           Adriana Fernandes
+
+  Convert CHM file into a set of image files and some meta information
+  files.
+
+  Meta files:
+    info: some meta information, only title currently
+    toc: table of contents
+    list: list of image files
+
+- Based on chmtopdf from Michele Baldessari <michele@pupazzo.org>
+
+- Based on Gnochm and Pychm code from Adriana Fernandes.
+  http://gnochm.sourceforge.net/index.html
+"""
+
+__version__ = '0.0.1'
+
+from chm import chm, chmlib
+import codecs
+import sys, os, os.path, glob, re
+from htmlentitydefs import entitydefs
+from sgmllib import SGMLParser, SGMLParseError
+import HTMLParser
+import gtk
+import gobject
+import urlparse
+from optparse import OptionParser
+import tempfile
+import logging
+import shutil
+
+import ibpy.imb
+
+entityref = re.compile('&((?P<str>[a-zA-Z][a-zA-Z0-9]*)|#(?P<dec>[0-9]+)|#[xX](?P<hex>[0-9a-fA-F]+));')
+def repl_entities(text):
+    pos = 0
+    while 1:
+        match = entityref.search(text, pos)
+        if match:
+            ent = text[match.start(0): match.end(0)]
+            pos = match.start(0) + 1
+            if match.group("str") and entitydefs.has_key(match.group("str")):
+                subs = entitydefs[match.group("str")].decode(
+                    'latin-1').encode('utf-8')
+                text = text.replace(ent, subs)
+            elif match.group("dec"):
+                subs = unichr(int(match.group("dec"))).encode('utf-8')
+                text = text.replace(ent, subs)
+            elif match.group("hex"):
+                subs = unichr(int(match.group("hex"), 16)).encode('utf-8')
+                text = text.replace(ent, subs)
+        else:
+            break
+    return text
+
+class TopicsParser(SGMLParser):
+    "A parser for a Topics file"
+    
+    def __init__(self, model):
+        SGMLParser.__init__(self)
+        self.first = 1
+        self.parent = None
+        self.sibling = None
+        self.in_obj = 0
+        self.name = ""
+        self.local = ""
+        self.param = ""
+        self.add_level = 0
+        self.model = model
+        self.linklist = {}
+        #self.column = 0
+
+    def feed_and_get_links(self, data):
+        self.feed(data)
+        return self.linklist
+
+    def unknown_starttag(self, tag, attrs):
+        if (tag == "ul"):
+            if self.first:
+                self.first = 0
+            else:
+                self.add_level = 1
+                #self.column = self.column + 1
+            #print ' ' * self.column, '<ul>'
+        elif (tag == "object"):
+            for x, y in attrs:
+                if ((x.lower() == "type") and (y.lower() == "text/sitemap")):
+                    self.in_obj = 1
+        elif ((tag.lower() == "param") and (self.in_obj == 1)):
+            for x, y in attrs:
+                if (x.lower() == "name"):
+                    self.param = y.lower()
+                elif (x.lower() == "value"):
+                    if (self.param == "name") and (self.name == ""):
+                        self.name = y
+                        #print '  Name=', self.name
+                    elif (self.param == "local"):
+                        self.local = y
+                        #print ' ' * self.column, '  Local=', y
+                    elif (self.param == "merge"):
+                        self.in_obj = 0
+
+    def unknown_endtag(self, tag):
+        if (tag == "ul"):
+            #print ' ' * self.column, '</ul>'
+            #self.column = self.column - 1
+            self.sibling = self.parent
+            if self.parent:
+                self.parent = self.model.iter_parent(self.parent)
+        elif (tag == "object") and (self.in_obj == 1):
+            if self.add_level == 1:
+                self.parent = self.sibling
+                self.sibling = self.model.append(self.parent)
+                self.add_level = 0
+            else:
+                self.sibling = self.model.append(self.parent)
+            if self.local != None and len(self.local) > 0:
+                if self.local[0] not in ('/', '#'):
+                    self.linklist['/' + self.local] = self.sibling
+                else:
+                    self.linklist[self.local] = self.sibling
+            name=repl_entities(self.name)
+            if name.strip():
+                self.model.set_value(self.sibling,0,name)
+                self.model.set_value(self.sibling,1,repl_entities(self.local))
+            self.in_obj = 0
+            self.name = ""
+            self.local = ""
+
+class HTMLLinkScanner(HTMLParser.HTMLParser):
+    #tags = {'a':'href','img':'src','frame':'src','base':'href'}
+    tags = {'img':'src'}
+
+    def reset(self):
+        self.links = {}
+        self.replacements = []
+        HTMLParser.HTMLParser.reset(self)
+
+    def handle_starttag(self, tag, attrs):
+        if tag in self.tags:
+            checkattrs = self.tags[tag]
+            if isinstance(checkattrs, (str, unicode)):
+                checkattrs = [checkattrs]
+                for attr, value in attrs:
+                    if attr in checkattrs:
+                        if tag != 'base':
+                            link = urlparse.urldefrag(value)[0]
+                            self.links[link] = True
+                    self.replacements.append((self.get_starttag_text(), attr, value))
+
+def convert_chm_to_img(fname, tmp_dir, keep_tmp=False):
+    logging.debug("Working in : %s" % tmp_dir)
+    chm_handle = chm.CHMFile()
+    chm_handle.LoadCHM(fname)
+
+    cwd = os.getcwd()
+    (fname_base, fname_ext) = os.path.splitext(fname)
+    imb_fn = os.path.abspath(fname_base + '.imb')
+
+    dname_imgs = os.path.abspath(fname_base + "_imgs")
+    if os.path.isdir(dname_imgs):
+        shutil.rmtree(dname_imgs)
+    elif os.path.exists(dname_imgs):
+        os.unlink(dname_imgs)
+    os.mkdir(dname_imgs)
+
+    imb_book = ibpy.imb.Book(title=chm_handle.title)
+
+    topics = chm_handle.GetTopicsTree()
+    index  = chm_handle.GetIndex()
+    cmodel = gtk.TreeStore(gobject.TYPE_STRING,
+                           gobject.TYPE_STRING)
+
+    parser    = TopicsParser(cmodel)
+    linktable = parser.feed_and_get_links(topics)
+    l         = []
+    rhash     = {}
+
+    for i in linktable.keys():
+        link = cmodel.get_path(linktable[i])
+        l.append(link)
+        rhash[link] = i
+
+    l.sort()
+    for i in l:
+        treeiter = cmodel.get_iter(i)
+        page_title = cmodel.get_value(treeiter, 0)
+        file_path = rhash[i]
+        
+        (dir_name, file_name) = os.path.split(file_path)
+        bdir_name = os.path.basename(dir_name)
+        logging.debug("dir_name %s, file_name %s, file_path %s" % \
+                          (dir_name, file_name, file_path))
+        abs_dir_name  = os.path.join(tmp_dir, bdir_name)
+        logging.debug("abs_dir_name %s" % (abs_dir_name))
+        abs_file_path = os.path.join(abs_dir_name, file_name)
+        logging.debug("file_path %s" % (abs_file_path))
+        (ret, ui) = chm_handle.ResolveObject(rhash[i])
+        if ret == 0:
+            try:
+                os.makedirs(abs_dir_name)
+            except:
+                pass
+            (ret2, data) = chm_handle.RetrieveObject(ui)
+            if ret2 == 0:
+                continue
+
+            f = open(abs_file_path, "w")
+            f.write(data)
+            f.close()
+
+            scanner = HTMLLinkScanner()
+            scanner.feed(data)
+            for i in scanner.links:
+                tmp_dir2 = os.path.join(abs_dir_name, i)
+                rel_dir = os.path.join(dir_name, i)
+                logging.debug("Create %s -> %s" % (rel_dir, tmp_dir2))
+                (ret3, link) = chm_handle.ResolveObject(rel_dir)
+                if ret3 == 0:
+                    (ret4, data) = chm_handle.RetrieveObject(link)
+                    if ret4 == 0:
+                        continue
+                    try:
+                        os.makedirs(os.path.dirname(tmp_dir2))
+                    except:
+                        pass
+                    f = open(tmp_dir2, "w")
+                    f.write(data)
+                    f.close()
+
+            # Create png
+            os.chdir(abs_dir_name)
+            rfile_path = file_path.lstrip(os.sep)
+            (s, ext) = os.path.splitext(rfile_path)
+            png_path = s + ".png"
+            png_abs_prefix = os.path.join(abs_dir_name, s)
+            png_templ = png_abs_prefix + "-%d.png"
+            png_glob = png_abs_prefix + "-[0-9][0-9][0-9][0-9]*.png"
+            png_abs_path = png_abs_prefix + ".png"
+
+            s = "ibhtml2img file://%s %s" % (abs_file_path, png_templ)
+            logging.debug("Exec : %s" % s)
+            os.system(s)
+
+            imgfs = glob.glob(png_glob)
+            imgfs.sort()
+
+            nimgfs = len(imgfs)
+            if nimgfs == 1:
+                os.rename(imgfs[0], png_abs_path)
+            elif nimgfs:
+                s = "ibimgcat " + png_abs_path + " " + " ".join(imgfs)
+                os.system(s)
+                s = "rm -f " + " ".join(imgfs)
+                os.system(s)
+
+            if os.path.exists(png_abs_path):
+                logging.debug("%s created successfully" % (png_abs_path))
+            else:
+                logging.critical("FAILED to create %s" % (png_abs_path))
+                sys.exit(-1)
+
+            pg = imb_book.add_page(png_abs_path)
+            imb_book.add_toc_entry(page_title, pg)
+
+            os.chdir(cwd)
+
+    imb_book.save(imb_fn)
+
+    if not keep_tmp and len(tmp_dir) > 3:
+        shutil.rmtree(tmp_dir);
+
+    os.chdir(cwd)
+
+def find_executable(fname):
+    path_dirs = os.getenv("PATH").split(":")
+    for i in path_dirs:
+        abs_name = os.path.join(i, fname)
+        if os.path.exists(abs_name):
+            return abs_name
+    return None
+
+def main(args):
+    tmp_dir = tempfile.mkdtemp("ibchm2imb")
+    if tmp_dir == None:
+        print "mkstemp failed."
+        sys.exit(-1)
+
+    usage = "Usage: %s [options] <file.chm>" % (sys.argv[0])
+    parser = OptionParser(usage=usage,
+                          version=('%s %s' % (sys.argv[0], __version__)))
+    parser.add_option("-k", "--keep", action="store_true",
+                      dest="keep", default=False,
+                      help="Keeps temporary directory around " +
+                      "(useful for fetching the html files)")
+    parser.add_option("-d", "--debug", action="store_true",
+                      dest="debug", default=False,
+                      help="Show some debug output")
+
+    options, args = parser.parse_args()
+    if len(args) != 1:
+        print usage
+        sys.exit(-1)
+    keep = options.keep
+    if options.debug:
+        logging.basicConfig(level=logging.DEBUG,
+                            format='%(asctime)s %(levelname)s %(message)s')
+    else:
+        logging.basicConfig(level=logging.WARNING,
+                            format='%(asctime)s %(levelname)s %(message)s')
+
+    convert_chm_to_img(args[0], tmp_dir, keep)
+
+if __name__=="__main__":
+    main(sys.argv)

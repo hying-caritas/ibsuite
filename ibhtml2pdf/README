@@ -1,0 +1,34 @@
+About
+-----
+
+Convert HTML to PDF with mozilla rendering engine.
+
+The best rendering application of HTML is web browser such as
+FireFox(Mozilla), but full function web browser is too large for some
+devices such as ebook reader. One of the solution is to pre-render
+HTML on PC with web browser and send the resulting PDF to devices.
+
+
+* Usage and configuration
+
+Make sure you have Xulrunner correctly installed.
+
+xulrunner --app ibhtml2pdf/application.ini [-pw <width>] [-ph <height>] \
+	  file:///tmp/foo.html /tmp/foo.pdf
+
+-pw and -ph is to used to specify paper width and height.
+
+
+-----------------------------------------
+|I don't know if it works under windows.|
+-----------------------------------------
+
+* Note: Running on Windows
+
+In order to get ibhtml2pdf to work on windows you'll need to install
+a suitable postscript printer. Download the "winsteng.exe" from Adobe
+http://www.adobe.com/support/downloads/product.jsp?product=44&platform=Windows
+install and configure a printer called "Generic PostScript Printer" that prints
+to a FILE: port.
+
+At this point ibhtml2pdf should work normally on windows as well with no changes.

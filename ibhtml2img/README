@@ -1,0 +1,18 @@
+About
+-----
+
+Convert HTML to image with mozilla rendering engine.
+
+The best rendering application of HTML is web browser such as
+FireFox(Mozilla), but full function web browser is too large for some
+devices such as ebook reader. One of the solution is to pre-render
+HTML on PC with web browser and send the resulting image to
+devices.
+
+
+Usage
+-----
+
+xulrunner --app ibhtml2img-xulrunner/application.ini \
+	  [-zoom <zoom factor>] [-width <width>] \
+	  <input html url> <output png file>

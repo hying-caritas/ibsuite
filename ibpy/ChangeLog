@@ -1,0 +1,107 @@
+2008-12-14 Huang Ying <huang.ying.caritas@gmail.com>
+
+	* Version: 0.9 preview for Html2Img
+
+	* overall: Add imgs input type support
+
+2008-09-20 Huang Ying <huang.ying.caritas@gmail.com>
+
+	* Version: 0.8
+
+	* overall: Reorganize program in a more modular way.
+
+	* pi.image: Add unpaper support for scanned book
+
+	* pi.image: Add column compress support for scanned book
+
+	* pi.divide: Add simple divider for divide = 1
+
+2008-08-30 Huang Ying <huang.ying.caritas@gmail.com>
+
+	* Version: 0.7
+
+	* pi.py: Add LRF output support.
+
+	* pi.py: Add TOC support for LRF output format
+
+	* pi.py: Add output rotate support.
+
+	* pdfminfo: Add pdfminfo to extract PDF information such as TOC,
+	title, author, etc.
+
+	* overall: Add initial windows support, thanks ashkulz of
+	mobileread forum.
+
+2008-08-11 Huang Ying <huang.ying.caritas@gmail.com>
+
+	* Version: 0.6
+
+	* pi.py: Initial implementation of embolden.
+
+	* pi.py: Use norm coordinate in class Page and Line.
+
+	* pi.py: Add edge trimming support.
+
+	* pi.py: Add run pages mode.
+
+	* pi.py: Add page range support.
+
+	* pi.py: Re-work ImageOutput, split multi-page image.
+
+	* pi.py: Rotate during scale if approriate.
+
+	* img_dir_to_pdf.sh: Add color reduction support.
+
+2008-05-17 Huang Ying <huang.ying.caritas@gmail.com>
+
+	* Version: 0.5
+
+	* pi.py: Detect word, and break lines at word end when possible.
+
+	* pi.py: Re-align the 'split line segment' (second half of line)
+	  to align with the next line's indenting when appropriate. This
+	  will make the first line indent and bullet items line up better.
+
+	* img_dir_to_pdf.sh: Added to convert from images to pdf.
+
+2008-05-10 Huang Ying <huang.ying.caritas@gmail.com>
+
+	* Version: 0.4
+
+	* Some algorithms are configurable
+
+	* For some text may have problem, present both merged and divided
+	  version.
+
+
+2008-05-03 Huang Ying <huang.ying.caritas@gmail.com>
+
+	* Version: 0.3
+	
+	* Rewrite most algorithm in python except the image parsing (break
+	  image into lines and characters). This will make it easier to
+	  add new algorithm (hack).
+
+	* pi.py: Add some hacks to deal with equation and figure.
+
+
+2008-04-29 Huang Ying <huang.ying.caritas@gmail.com>
+
+	* Version: 0.2
+
+	* Split lines in two equal halves or optional equal thirds or
+	  equal quarters
+
+	* Separate output image into customizable page size
+
+	* Flex can be designate by user configuration
+
+	* Calculate DPI for each page
+
+	* Figure detecting and special processing. The figures are scaled
+	  to page width and output twice, scaled and split.
+
+
+2008-04-23 Huang Ying <huang.ying.caritas@gmail.com>
+
+	* Version: 0.1

@@ -1,0 +1,53 @@
+digraph PDFDivide {
+	rankdir = UD;
+
+	PDF [shape=box];
+	Img1 [shape=box];
+	Img2 [shape=box];
+	Img3 [shape=box];
+	Page1 [shape=box];
+	Page2 [shape=box];
+	Segments [shape=box];
+	Imgs1 [shape=box];
+	Imgs2 [shape=box];
+
+	PageMap [shape=box, color=gray, style=filled];
+	PDFMeta [shape=box, color=gray, style=filled];
+	BookMarks [shape=box, color=gray, style=filled];
+	Output [shape=box, color=gray, style=filled];
+	ImgList [shape=box, color=gray, style=filled];
+
+	PDF -> pdftoppm;
+	pdftoppm -> Img1;
+	Img1 -> unpaper;
+	unpaper -> Img2;
+	Img2 -> dilate;
+	dilate -> Img3;
+
+	Img2 -> page_parser;
+	page_parser -> Page1;
+	Page1 -> high_level_parser;
+	high_level_parser -> Page2;
+	Page2 -> page_divider;
+	Img3 -> page_divider;
+	page_divider -> Segments;
+
+	Segments -> assembler;
+	assembler -> Imgs1;
+	Imgs1 -> post_proc;
+	post_proc -> Imgs2;
+
+	Imgs2 -> collector
+	collector -> ImgList
+	collector -> PageMap;
+
+	PDF -> pdf_info_parser;
+	pdf_info_parser -> PDFMeta;
+	pdf_info_parser -> BookMarks;
+
+	PDFMeta -> generator;
+	BookMarks -> generator;
+	ImgList -> generator;
+	PageMap -> generator;
+	generator -> Output;
+}

@@ -1,0 +1,66 @@
+IBSUITE
+-------
+
+ibsuite stands for image book suite. It contains a set of tools to
+convert ebook in various format (pdf, chm, html) into a set of images,
+reformat the images (crop, embold, divide, etc), and assemble the
+result images into a new ebook.
+
+
+COMPONENTS
+----------
+
+ibhtml2img:
+	convert html to image with xulrunner
+
+ibhtml2pdf:
+	convert html to pdf with xulrunner
+
+iblineparser:
+	parser input image, extract line information
+
+ibpdfinfo:
+	get some meta-information from pdf file, such as title,
+	author, table of contents etc.
+
+ibpy:
+	python module, which is the driver the whole system, it uses
+	above program to convert input file to image, extract line
+	information from image, dilate image, and re-assembile lines
+	into a new image, generate output e-book.
+
+ibtools:
+	A set of utilities and tools, some of them are used internal
+	by ibsuite, others are user command provided by ibsuite.
+
+
+USAGE
+-----
+
+
+
+INSTALL
+-------
+
+Currently, only Linux is supported, but I think it may work on some
+unix enviroment (including cygwin on Windows) after some
+work. Currently only install from source code is supported.
+
+Pre-requirement:
+
+a. gcc, g++, bash, make
+b. libfontconfig-dev, libnetpbm-dev, libgtk-dev
+c. python
+d. python-imaging, imagemagick
+e. for HTML/CHM support: python-chm, xulrunner
+f. for scanning book: unpaper
+
+Build:
+
+./configure
+make
+
+Install:
+
+# to be root
+make install
