@@ -24,10 +24,11 @@ ibpdfinfo:
 	author, table of contents etc.
 
 ibpy:
-	python module, which is the driver the whole system, it uses
-	above program to convert input file to image, extract line
-	information from image, dilate image, and re-assembile lines
-	into a new image, generate output e-book.
+
+	python module, which is the driver of the whole system, it
+	uses above programs to convert input file to image, extract
+	line information from image, dilate image, and re-assemble
+	lines into a new image, generate output e-book.
 
 ibtools:
 	A set of utilities and tools, some of them are used internal
@@ -37,6 +38,57 @@ ibtools:
 USAGE
 -----
 
+The most important command of ibsuite is ibreformat, the basic usage
+is as follow:
+
+  ibreformat [options] <input file>
+
+In most cases, something like following:
+
+  ibreformat -o <output file> --iprof=<iprof> --oprof=<oprof> \
+    --pprof=<pprof> <input file>
+
+Where <input file> is input file name, <output file> is output file
+name, <iprof> is input profile, <oprof> is output profile, <pprof> is
+processing profile.
+
+Available input/output/processing profiles are as follow:
+
+input profiles:
+
+img: for scanned book
+
+output profiles:
+
+prs505p: for Sony PRS505 in portrait mode
+
+prs505l: for Sony PRS505 in landscape mode
+
+processing profiles:
+
+divide2: divide one line into two line (a kind of simple reflow)
+
+resize: Resize and dilate pages
+
+repage: Re-page input book, without much other processing such as dilate.
+
+
+For other command line options, please refer to "ibreformat -h".
+
+
+Some useful command line option combinations:
+
+For scanned book on PRS505:
+
+  ibsuite -o <output file> -iprof=img -pprof=resize -oprof=prs505l <input file>
+
+For chm file on PRS505:
+
+  ibchm2imb <xxx>.chm
+
+When it finishs, <xxx>.imb will be generated, then
+
+  ibsuite -o <output file> -pprof=repage --oprof=prs505l <xxx>.imb
 
 
 INSTALL
@@ -50,10 +102,10 @@ Pre-requirement:
 
 a. gcc, g++, bash, make
 b. libfontconfig-dev, libnetpbm-dev, libgtk-dev
-c. python
-d. python-imaging, imagemagick
+c. python, python-imaging
+d. imagemagick
 e. for HTML/CHM support: python-chm, xulrunner
-f. for scanning book: unpaper
+f. for scanned book: unpaper
 
 Build:
 
