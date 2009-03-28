@@ -122,7 +122,7 @@ class IMBToPPM(object):
     def __init__(self, config):
         object.__init__(self)
         self.imgs_dir = config.input_fn
-        self.output_prefix = config.output_prefix
+        self.output_prefix = '%s/out' % (config.tmp_dir,)
         self.book = Book()
         self.book.load(config.input_fn)
     def get_image(self, page_num):

@@ -10,6 +10,7 @@
 import os
 import tempfile
 import Image, ImageFilter
+import config
 from subprocess import call
 
 from util import *
@@ -23,7 +24,7 @@ class PageImageRef(object):
         self.image = image
         self.file_name = file_name
     def __del__(self):
-        if self.file_name:
+        if self.file_name and not config.debug:
             os.unlink(self.file_name)
     def clear(self):
         self.file_name = None
@@ -229,18 +230,15 @@ class Collector(object):
         object.__init__(self)
         self.page_map = {}
         self.out_files = []
-        self.output_prefix = config.output_prefix
-        self.pfw = config.pfw
+        self.output_prefix = "%s/out" % (config.tmp_dir,)
         self.first_page = config.first_page
         self.last_page = config.last_page
     def collect(self, pimg_ref):
         in_file_name = pimg_ref.get_file_name('png')
         ext = in_file_name[-3:]
         pn = pimg_ref.page_num
-        out_file_name = '%s-%0*d-%02d.%s' % (self.output_prefix,
-                                           self.pfw, pn,
-                                           pimg_ref.sub_page_num,
-                                           ext)
+        out_file_name = '%s-%06d-%02d.%s' % (self.output_prefix,
+                                             pn, pimg_ref.sub_page_num, ext)
         os.rename(in_file_name, out_file_name)
         pimg_ref.clear()
         self.out_files.append(out_file_name)

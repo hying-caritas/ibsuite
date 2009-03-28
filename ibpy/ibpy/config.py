@@ -14,6 +14,8 @@ from optparse import OptionParser
 import input
 from util import *
 
+debug = False
+
 ext_map = {
     '.pdf' : 'pdf',
     '.imb' : 'imb',
@@ -108,7 +110,6 @@ config_options = {
     'opedge_ex' : (float, None, None, 'output page edge expanded'),
     'colors' : (int, 4, None, 'Color number for output image'),
     'rotate' : (str2bool, False, None, 'Rotate output image'),
-    'output_prefix' : (str, None, None, 'Output image prefix'),
     'out_file_name' : (str, None, '-o', 'Output file name'),
     'out_format' : (str, None, None, 'Output format'),
     'title' : (str, None, None, 'Book title'),
@@ -116,6 +117,7 @@ config_options = {
     'first_page' : (int, 1, "-f", 'First page'),
     'last_page' : (int, None, "-l", 'Last page'),
     'crop' : (str2bool, False, None, 'Crop the result'),
+    'debug' : (str2bool, False, None, "Debug mode"),
 }
 
 def setup_option_parser(parser):
@@ -226,89 +228,32 @@ class Config(object):
                 self.bookmarks = bms
             if not hasattr(self, 'last_page'):
                 self.last_page = meta.pages
-            if sys.platform == 'win32':
-                self.pfw = 6  # this is a workaround for the Windows version
-            else:
-                self.pfw = len('%d' % (meta.pages,))
     def check(self):
         self.out_size = (self.out_width, self.out_height)
         if self.input_fn is None:
             print 'Please specify input file name!'
             sys.exit(-1)
-        (self.input_fn_base, input_ext) = os.path.splitext(self.input_fn)
+        (input_fn_base, input_ext) = os.path.splitext(self.input_fn)
 
         self.tmp_dir = tempfile.mkdtemp('ibpy')
 
-        if self.out_format == 'image':
-            if self.output_prefix is None:
-                print 'Please specify output_prefix for image output format!'
-                sys.exit(-1)
-        else:
-            if self.output_prefix is None:
-                self.output_prefix = self.tmp_dir + '/out'
-            if self.out_file_name is None:
+        self.output_prefix = self.tmp_dir + '/out'
+        if self.out_file_name is None:
+            self.out_file_name = '%s.%s' % \
+                (input_fn_base, self.out_format)
+            if self.out_file_name == self.input_fn:
                 self.out_file_name = '%s.%s' % \
-                    (self.input_fn_base, self.out_format)
-                if self.out_file_name == self.input_fn:
-                    self.out_file_name = '%s.%s' % \
-                        (self.input_fn, self.out_format)
+                    (self.input_fn, self.out_format)
 
         if self.title == '':
-            self.title = self.input_fn_base
+            self.title = input_fn_base
 
         if self.opedge_ex is None:
             if self.dilate:
                 self.opedge_ex = 2
             else:
                 self.opedge_ex = 0
-    def load_old(self, conf_kv):
-        self.kv = conf_kv
-        self.input_fn = conf_kv.get('input')
-        in_fmt = file_name_to_format(self.input_fn, 'pdf')
-        self.input_format = conf_kv.get('input_format', inf_fmt)
-        self.input_type = conf_kv.get('input_type', 'graph')
-        self.divide = conf_kv.get('divide', 2, int)
-        self.margin = conf_kv.get('margin', 1, int)
-        ow = conf_kv.get('out_width', 600, int)
-        oh = conf_kv.get('out_height', 800, int)
-        self.out_size = (ow, oh)
-        self.empty_coeff = conf_kv.get('empty_coeff', 0.95, float)
-        self.max_il_coeff = conf_kv.get('max_il_coeff', 1.0 / 12, float)
-        self.flex_coeff = conf_kv.get('flex_coeff', None, float)
-        self.fix_figure_by_vspace = conf_kv.get('fix_figure_by_vspace',
-                                                True, str2bool)
-        self.fix_figure_by_halign = conf_kv.get('fix_figure_by_halign',
-                                                True, str2bool)
-        self.merge_center = conf_kv.get('merge_center', True, str2bool)
-        self.merge_sparse = conf_kv.get('merge_sparse', True, str2bool)
-        self.vector_parse = conf_kv.get('vector_parse', False, str2bool)
-        self.run_pages = conf_kv.get('run_pages', False, str2bool)
-        self.unpaper = conf_kv.get('unpaper', 'null')
-        self.dilate = conf_kv.get('dilate', True, str2bool)
-        self.trim_left = conf_kv.get('trim_left', 0., float) / 100.
-        self.trim_top = conf_kv.get('trim_top', 0., float) / 100.
-        self.trim_right = conf_kv.get('trim_right', 0., float) / 100.
-        self.trim_bottom = conf_kv.get('trim_bottom', 0., float) / 100.
-        self.overlap = conf_kv.get('overlap', 10., float) / 100.
-        self.parsing_dpi = conf_kv.get('parsing_dpi', 180, int)
-        self.rendering_dpi = conf_kv.get('rendering_dpi', 360, int)
-        self.opedge_ex_usr = conf_kv.get('opedge_ex', None, int)
 
-        self.colors = conf_kv.get('colors', 4, int)
-        self.rotate = conf_kv.get('rotate', False, str2bool)
-        self.output_prefix = conf_kv.get('output_prefix')
-        self.out_file_name = conf_kv.get('out_file_name')
-        out_fmt = file_name_to_format(self.out_file_name, 'lrf')
-        self.out_format = conf_kv.get('out_format', out_fmt)
-
-        meta, bms = input.get_input_info(self)
-        self.title = conf_kv.get('title', meta.doc_title)
-        self.author = conf_kv.get('author', meta.author)
-        self.bookmarks = conf_kv.get('bookmarks', bms)
-        self.first_page = conf_kv.get('first_page', 1, int)
-        self.last_page = conf_kv.get('last_page', meta.pages, int)
-        if sys.platform == 'win32':
-            default_pfw = 6      # this is a workaround for the Windows version
-        else:
-            default_pfw = len('%d' % (meta.pages,))
-        self.pfw = conf_kv.get('pfw', default_pfw)
+        global debug
+        if self.debug:
+            debug = self.debug

@@ -9,6 +9,7 @@
 
 from subprocess import Popen, PIPE, call
 import os.path
+import re
 
 from image import PageImageRef
 
@@ -16,41 +17,56 @@ class PDFToPPM(object):
     def __init__(self, config):
         object.__init__(self)
         self.pdf_fn = config.input_fn
-        self.output_prefix = config.output_prefix
+        self.tmpd = '%s/pdftoppm' % (config.tmp_dir,)
+        try:
+            os.makedirs(self.tmpd)
+        except:
+            pass
+        self.output_prefix = '%s/out' % (self.tmpd,)
         self.dpi = config.rendering_dpi
-        self.pfw = config.pfw
     def get_image(self, page_num):
         spage_num = '%d' % (page_num,)
         sdpi = '%d' % (self.dpi,)
         ret = call(['pdftoppm', '-r', sdpi, '-f', spage_num, '-l', spage_num,
                     '-gray', self.pdf_fn, self.output_prefix])
         assert(ret == 0)
-        img_fn = '%s-%0*d.pgm' % (self.output_prefix, self.pfw, page_num)
-        return PageImageRef(page_num, file_name = img_fn)
+        fns = os.listdir(self.tmpd)
+        fns = [os.path.join(self.tmpd, fn) for fn in fns]
+        re_img_fn = re.compile('%s-0*%d.pgm' % (self.output_prefix, page_num))
+        img_fns = [fn for fn in fns if re_img_fn.match(fn)]
+        assert(len(img_fns) == 1)
+        return PageImageRef(page_num, file_name = img_fns[0])
 
 class PDFImage(object):
     def __init__(self, config):
         object.__init__(self)
         self.pdf_fn = config.input_fn
         self.output_prefix = config.output_prefix
-        self.pfw = config.pfw
+        self.tmpd = '%s/pdfimage' % (config.tmp_dir,)
+        try:
+            os.makedirs(self.tmpd)
+        except:
+            pass
+        self.output_prefix = '%s/out' % (self.tmpd,)
+        self.re_out_fn = re.compile('%s-0*\\.(ppm|pbm)' % (self.output_prefix,))
     def get_image(self, page_num):
         spage_num = '%d' % (page_num,)
         ret = call(['pdfimages', '-f', spage_num, '-l', spage_num,
                     self.pdf_fn, self.output_prefix])
         assert(ret == 0)
-        fn_stem = '%s-%0*d' % (self.output_prefix, self.pfw, 0)
-        img_fn = '%s-%0*d.pgm' % (self.output_prefix, self.pfw, page_num)
-        fn_ppm = fn_stem + '.ppm'
-        fn_pbm = fn_stem + '.pbm'
-        if os.path.exists(fn_ppm):
-            ret = call(['convert', '-depth', '8', fn_ppm, img_fn])
-            assert(ret == 0)
-            os.unlink(fn_ppm)
-        else:
-            ret = call(['convert', '-depth', '8', '-negate', fn_pbm, img_fn])
-            assert(ret == 0)
-            os.unlink(fn_pbm)
+        img_fn = '%s-%06d.pgm' % (self.output_prefix, page_num)
+        fns = os.listdir(self.tmpd)
+        fns = [os.path.join(self.tmpd, fn) for fn in fns]
+        out_fns = [fn for fn in fns if self.re_out_fn.match(fn)]
+        assert(len(out_fns) == 1)
+        out_fn = out_fns[0]
+        cmdline = ['convert', '-depth', '8']
+        if out_fn.endswith('pbm'):
+            cmdline.append('-negate')
+        cmdline.extend([out_fns[0], img_fn])
+        ret = call(cmdline)
+        assert(ret == 0)
+        os.unlink(out_fns[0])
         return PageImageRef(page_num, file_name = img_fn)
 
 def create_pdf_to_ppm(config):

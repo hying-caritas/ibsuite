@@ -22,8 +22,17 @@ import config
 from util import *
 
 def reformat(args):
+    def setup():
+        rtmpd = os.path.join(conf.tmp_dir, 'tmp')
+        try:
+            os.makedirs(rtmpd)
+        except:
+            pass
+        tempfile.tempdir = rtmpd
+
     def clean():
-        shutil.rmtree(conf.tmp_dir);
+        if not config.debug:
+            shutil.rmtree(conf.tmp_dir);
 
     def page_hl_parser_train():
         nsample = min(10, (conf.last_page-conf.first_page+1)/2)
@@ -39,6 +48,7 @@ def reformat(args):
 
     random.seed()
     conf = config.Config(args)
+    setup()
 
     inputtoppm = input.create_input_to_ppm(conf)
     precrop = image.PreCrop(conf)
