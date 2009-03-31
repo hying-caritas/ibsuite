@@ -16,3 +16,5 @@ xml
 *.lo
 .libs
 version.xml
+poppler-undeclared.txt
+poppler-attachment.sgml.sgml
