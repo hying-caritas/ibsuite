@@ -157,8 +157,7 @@ class Assembler(object):
     def start_page(self, page):
         self.page = page
         self.page.out_no = 0
-    def put_hline(self, il):
-        pil = self.page.norm2opxl(il)
+    def put_hline(self, pil):
         hl = HLine(self.page, pil)
         self.segs.append(hl)
     def put_seg(self, seg, il):
@@ -183,7 +182,7 @@ class Assembler(object):
         self.start_page(page)
         for seg in segs:
             if isinstance(seg, HLine):
-                self.put_hline(seg.out_bl)
+                self.put_hline(seg.pout_bl)
             else:
                 self.put_seg(seg, seg.out_bl)
         self.end_page()

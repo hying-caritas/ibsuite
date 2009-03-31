@@ -39,7 +39,7 @@ def reformat(args):
         nsample = max(nsample, 1)
         for i in range(nsample):
             pn= random.randint(conf.first_page, conf.last_page)
-            pimg_ref = pdftoppm.get_image(pn)
+            pimg_ref = inputtoppm.get_image(pn)
             pimg_ref = precrop.convert(pimg_ref)
             pimg_ref = unpaper.convert(pimg_ref)
             page = page_parser.parse(pimg_ref)

@@ -4,6 +4,7 @@ import shutil
 from xml.sax.saxutils import escape
 from xml.sax import make_parser
 from xml.sax.handler import feature_namespaces, ContentHandler
+import codecs
 
 from image import PageImageRef
 
@@ -36,7 +37,7 @@ class Book(object):
     def _add_toc_entry(self, entry):
         self.toc_entries.append(entry)
     def save(self, out_fn, move_image = False):
-        outf = file(out_fn, "wb")
+        outf = codecs.open(out_fn, "wb", "utf-8")
         (s, ext) = os.path.splitext(out_fn)
         outd = s + '_imgs'
         outd_base = os.path.basename(outd)
@@ -59,7 +60,7 @@ class Book(object):
         outf.write('<?xml version="1.0" encoding="utf-8"?>\n')
         outf.write('<imb>\n')
         if self.title:
-            s = '\t<book_title>%s</book_title>\n' % (escape(self.title),)
+            s = u'\t<book_title>%s</book_title>\n' % (escape(self.title),)
             outf.write(s)
         if self.author:
             s = '\t<author>%s</author>\n' % (escape(self.author),)
@@ -72,7 +73,7 @@ class Book(object):
         outf.write('\t<toc>\n')
         for entry in self.toc_entries:
             outf.write('\t\t<entry>\n')
-            s = '\t\t\t<title>%s</title>\n' % (escape(entry.title),)
+            s = u'\t\t\t<title>%s</title>\n' % (escape(entry.title),)
             outf.write(s)
             outf.write('\t\t\t<page>%d</page>\n' % (entry.page,))
             outf.write('\t\t</entry>\n')
