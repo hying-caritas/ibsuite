@@ -24,10 +24,7 @@ from util import *
 def __reformat(args):
     def setup():
         rtmpd = os.path.join(conf.tmp_dir, 'tmp')
-        try:
-            os.makedirs(rtmpd)
-        except:
-            pass
+        makedirs(rtmpd)
         tempfile.tempdir = rtmpd
 
     def clean():

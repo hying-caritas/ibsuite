@@ -18,10 +18,7 @@ class PDFToPPM(object):
         object.__init__(self)
         self.pdf_fn = config.input_fn
         self.tmpd = '%s/pdftoppm' % (config.tmp_dir,)
-        try:
-            os.makedirs(self.tmpd)
-        except:
-            pass
+        makedirs(self.tmpd)
         self.output_prefix = '%s/out' % (self.tmpd,)
         self.dpi = config.rendering_dpi
     def get_image(self, page_num):
@@ -43,10 +40,7 @@ class PDFImage(object):
         self.pdf_fn = config.input_fn
         self.output_prefix = config.output_prefix
         self.tmpd = '%s/pdfimage' % (config.tmp_dir,)
-        try:
-            os.makedirs(self.tmpd)
-        except:
-            pass
+        makedirs(self.tmpd)
         self.output_prefix = '%s/out' % (self.tmpd,)
         self.re_out_fn = re.compile('%s-0*\\.(ppm|pbm)' % (self.output_prefix,))
     def get_image(self, page_num):

@@ -12,6 +12,7 @@ import math
 import re
 import subprocess
 import errno
+import os
 
 def temp_file_name(sfx = None):
     tf = tempfile.NamedTemporaryFile(suffix = sfx)
@@ -91,3 +92,10 @@ def Popen(*popenargs, **kwargs):
     return call_wrapper(subprocess.Popen, *popenargs, **kwargs)
 
 PIPE = subprocess.PIPE
+
+def makedirs(dir):
+    try:
+        os.makedirs(dir)
+    except OSError, e:
+        if e.errno != errno.EEXIST:
+            raise e
