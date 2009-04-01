@@ -1,20 +1,21 @@
 DIR_POPPLER = ../poppler
 INC_POPPLER = ${DIR_POPPLER}
-LIB_POPPLER = ${DIR_POPPLER}/poppler/.libs
+LIB_POPPLER = ${DIR_POPPLER}/poppler/libpoppler.la
 
 CXX = g++
+CXXLINK = libtool --mode=link ${CXX}
 CFLAGS = -I ${INC_POPPLER} -I ${INC_POPPLER}/poppler -DHAVE_CONFIG_H \
 	-Wall -Wno-write-strings -g
 CXXFLAGS = ${CFLAGS}
-LDFLAGS = -L ${LIB_POPPLER} -g
-LIBS = -lpoppler
+LDFLAGS = -g
+LIBS = ${LIB_POPPLER}
 PREFIX = /usr/local
 
 EXEC_NAME = ibpdfinfo
 OBJS = ibpdfinfo.o parseargs.o
 
 ${EXEC_NAME}: ${OBJS}
-	${CXX} -o $@ ${LDFLAGS} $^ ${LIBS}
+	${CXXLINK} -o $@ ${LDFLAGS} $^ ${LIBS}
 
 clean:
 	rm -rf ${EXEC_NAME} *.o
