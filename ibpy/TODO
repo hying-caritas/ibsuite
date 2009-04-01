@@ -1,6 +1,0 @@
-* Allow colored backgrounds/text input images instead of just
-  gray scale (pgm vs ppm/png/pbm). Accommodate images somehow, perhaps
-  shrink them down.
-
-* Support more output formats besides images. Such as some format, can
-  switch between divided and merged version.
