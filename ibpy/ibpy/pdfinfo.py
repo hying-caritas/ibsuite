@@ -4,7 +4,7 @@ from xml.sax import saxutils
 from xml.sax import make_parser
 from xml.sax.handler import feature_namespaces, ContentHandler
 
-from subprocess import Popen, PIPE
+from util import *
 
 class Bookmark(object):
     def __init__(self, title = None, page = None):

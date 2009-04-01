@@ -11,7 +11,6 @@ import os
 import tempfile
 import Image, ImageFilter
 import config
-from subprocess import call
 
 from util import *
 
@@ -92,9 +91,8 @@ class Unpaper(object):
     def convert(self, pimg_ref, out_file_name = None):
         if out_file_name is None:
             out_file_name = temp_file_name('.pgm')
-        ret = call(['unpaper', '-q', '--no-deskew',
+        check_call(['unpaper', '-q', '--no-deskew',
                     pimg_ref.get_file_name(), out_file_name])
-        assert(ret == 0)
         return pimg_ref.derive(file_name = out_file_name)
 
 class ColumnCondense(object):
@@ -205,8 +203,7 @@ class PostProc(object):
         if not proc:
             return pimg_ref
         cmd.extend([pimg_ref.get_file_name(), out_file_name])
-        ret = call(cmd)
-        assert(ret == 0)
+        check_call(cmd)
         return pimg_ref.derive(file_name = out_file_name)
 
 class FixBlackWhite(object):

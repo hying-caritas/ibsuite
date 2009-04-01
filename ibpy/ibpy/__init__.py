@@ -21,7 +21,7 @@ import generator
 import config
 from util import *
 
-def reformat(args):
+def __reformat(args):
     def setup():
         rtmpd = os.path.join(conf.tmp_dir, 'tmp')
         try:
@@ -99,3 +99,11 @@ def reformat(args):
     gen.generate(collector.out_files, collector.page_map)
 
     clean()
+
+def reformat(args):
+    try:
+        ret = 0
+        ret = __reformat(args)
+    except CommandNotFound, e:
+        print 'Command not found: %s\n' % (e.cmd,)
+    return ret

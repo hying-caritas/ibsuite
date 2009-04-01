@@ -7,11 +7,11 @@
 # (at your option) any later version.
 #
 
-from subprocess import Popen, PIPE, call
 import os.path
 import re
 
 from image import PageImageRef
+from util import *
 
 class PDFToPPM(object):
     def __init__(self, config):
@@ -27,9 +27,9 @@ class PDFToPPM(object):
     def get_image(self, page_num):
         spage_num = '%d' % (page_num,)
         sdpi = '%d' % (self.dpi,)
-        ret = call(['pdftoppm', '-r', sdpi, '-f', spage_num, '-l', spage_num,
-                    '-gray', self.pdf_fn, self.output_prefix])
-        assert(ret == 0)
+        check_call(['pdftoppm', '-r', sdpi, '-f', spage_num,
+                    '-l', spage_num, '-gray', self.pdf_fn,
+                    self.output_prefix])
         fns = os.listdir(self.tmpd)
         fns = [os.path.join(self.tmpd, fn) for fn in fns]
         re_img_fn = re.compile('%s-0*%d.pgm' % (self.output_prefix, page_num))
@@ -51,9 +51,8 @@ class PDFImage(object):
         self.re_out_fn = re.compile('%s-0*\\.(ppm|pbm)' % (self.output_prefix,))
     def get_image(self, page_num):
         spage_num = '%d' % (page_num,)
-        ret = call(['pdfimages', '-f', spage_num, '-l', spage_num,
+        check_call(['pdfimages', '-f', spage_num, '-l', spage_num,
                     self.pdf_fn, self.output_prefix])
-        assert(ret == 0)
         img_fn = '%s-%06d.pgm' % (self.output_prefix, page_num)
         fns = os.listdir(self.tmpd)
         fns = [os.path.join(self.tmpd, fn) for fn in fns]
@@ -64,8 +63,7 @@ class PDFImage(object):
         if out_fn.endswith('pbm'):
             cmdline.append('-negate')
         cmdline.extend([out_fns[0], img_fn])
-        ret = call(cmdline)
-        assert(ret == 0)
+        check_call(cmdline)
         os.unlink(out_fns[0])
         return PageImageRef(page_num, file_name = img_fn)
 

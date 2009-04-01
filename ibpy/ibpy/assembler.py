@@ -9,7 +9,6 @@
 
 import os
 import Image, ImageDraw
-from subprocess import call
 
 from image import PageImageRef
 from divide import HLine, PageSpace, SegPart

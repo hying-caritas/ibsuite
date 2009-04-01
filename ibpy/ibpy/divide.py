@@ -9,7 +9,6 @@
 
 import sys
 import os
-from subprocess import Popen, call, PIPE
 import copy
 import Image, ImageDraw
 from bisect import bisect_left

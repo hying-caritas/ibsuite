@@ -10,6 +10,8 @@
 import tempfile
 import math
 import re
+import subprocess
+import errno
 
 def temp_file_name(sfx = None):
     tf = tempfile.NamedTemporaryFile(suffix = sfx)
@@ -59,3 +61,33 @@ class kv(dict):
             return conv(self[key])
         else:
             return defult
+
+class CommandNotFound(Exception):
+    def __init__(self, cmd):
+        Exception.__init__(self)
+        self.cmd = cmd
+    def __str__(self):
+        return 'Command not found: %s' % (self.cmd,)
+
+def call_wrapper(call, *popenargs, **kwargs):
+    try:
+        ret = 0
+        ret = call(*popenargs, **kwargs)
+    except OSError, e:
+        if e.errno == errno.ENOENT:
+            if kwargs.has_key('executable'):
+                cmd = kwargs['executable']
+            else:
+                cmd = popenargs[0][0]
+            raise CommandNotFound(cmd)
+        else:
+            raise e
+    return ret
+
+def check_call(*popenargs, **kwargs):
+    return call_wrapper(subprocess.check_call, *popenargs, **kwargs)
+
+def Popen(*popenargs, **kwargs):
+    return call_wrapper(subprocess.Popen, *popenargs, **kwargs)
+
+PIPE = subprocess.PIPE

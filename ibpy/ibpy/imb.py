@@ -1,4 +1,3 @@
-from subprocess import call
 import os.path
 import shutil
 from xml.sax.saxutils import escape
@@ -7,6 +6,8 @@ from xml.sax.handler import feature_namespaces, ContentHandler
 import codecs
 
 from image import PageImageRef
+
+from util import *
 
 class Page(object):
     def __init__(self, img_fn, num):
@@ -129,6 +130,5 @@ class IMBToPPM(object):
     def get_image(self, page_num):
         iimg_fn = self.book.pages[page_num-1].img_fn
         oimg_fn = "%s-%d.pgm" % (self.output_prefix, page_num)
-        ret = call(['convert', iimg_fn, oimg_fn])
-        assert(ret == 0)
+        check_call(['convert', iimg_fn, oimg_fn])
         return PageImageRef(page_num, file_name = oimg_fn)
