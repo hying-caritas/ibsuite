@@ -10,6 +10,7 @@ CXXFLAGS = ${CFLAGS}
 LDFLAGS = -g
 LIBS = ${LIB_POPPLER}
 PREFIX = /usr/local
+INSTALL = libtool --mode=install install
 
 EXEC_NAME = ibpdfinfo
 OBJS = ibpdfinfo.o parseargs.o
@@ -21,7 +22,7 @@ clean:
 	rm -rf ${EXEC_NAME} *.o
 
 install:
-	install ibpdfinfo ${PREFIX}/bin
+	${INSTALL} ibpdfinfo ${PREFIX}/bin
 
 uninstall:
 	rm -rf ${PREFIX}/bin/ibpdfinfo

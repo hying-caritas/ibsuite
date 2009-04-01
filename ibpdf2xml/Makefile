@@ -9,6 +9,7 @@ CFLAGS = -I ${INC_POPPLER} -I ${INC_POPPLER}/poppler -DHAVE_CONFIG_H -Wall -Wno-
 CXXFLAGS = ${CFLAGS}
 LDFLAGS =
 LIBS = ${LIB_POPPLER}
+INSTALL = libtool --mode=install install
 
 EXEC_NAME = ibpdf2xml
 OBJS = pdftohtml.o HtmlOutputDev.o HtmlFonts.o HtmlLinks.o parseargs.o
@@ -20,7 +21,7 @@ clean:
 	rm -rf ${EXEC_NAME} *.o
 
 install:
-	install ibpdf2xml ${PREFIX}/bin
+	${INSTALL} ibpdf2xml ${PREFIX}/bin
 
 uninstall:
 	rm -rf ${PREFIX}/bin/ibpdf2xml
