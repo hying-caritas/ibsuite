@@ -1,9 +1,11 @@
-VER=0.1
+VER = 0.1
 
 all:
 	${MAKE} -C poppler
+ifndef NO_XUL
 	${MAKE} -C ibhtml2pdf
 	${MAKE} -C ibhtml2img
+endif
 	${MAKE} -C iblineparser
 	${MAKE} -C ibpdfinfo
 	${MAKE} -C ibpdf2xml
@@ -33,8 +35,10 @@ distclean:
 
 install:
 	${MAKE} -C poppler install
+ifndef NO_XUL
 	${MAKE} -C ibhtml2pdf install
 	${MAKE} -C ibhtml2img install
+endif
 	${MAKE} -C iblineparser install
 	${MAKE} -C ibpdfinfo install
 	${MAKE} -C ibpdf2xml install
@@ -42,8 +46,10 @@ install:
 	${MAKE} -C ibpy install
 
 uninstall:
+ifndef NO_XUL
 	${MAKE} -C ibhtml2pdf uninstall
 	${MAKE} -C ibhtml2img uninstall
+endif
 	${MAKE} -C iblineparser uninstall
 	${MAKE} -C ibpdfinfo uninstall
 	${MAKE} -C ibpdf2xml uninstall
