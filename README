@@ -109,10 +109,10 @@ f. for scanned book: unpaper
 
 Build:
 
-./configure
-make
+./configure [--prefix=<prefix>]
+make [PREFIX=<prefix>] [NO_XUL=1]
 
 Install:
 
-# to be root
-make install
+# become root
+make install [PREFIX=<prefix>]
