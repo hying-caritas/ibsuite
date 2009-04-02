@@ -4,6 +4,7 @@ all:
 	./build.sh xulapp
 
 install:
+	mkdir -p ${PREFIX}
 	./install.sh -prefix ${PREFIX}
 
 uninstall:

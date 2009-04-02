@@ -14,6 +14,7 @@ clean:
 	rm -rf ${EXEC} ${OBJS}
 
 install:
+	mkdir -p ${PREFIX}/bin
 	install iblineparser ${PREFIX}/bin
 
 uninstall:

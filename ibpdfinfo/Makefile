@@ -22,6 +22,7 @@ clean:
 	rm -rf ${EXEC_NAME} *.o
 
 install:
+	mkdir -p ${PREFIX}/bin
 	${INSTALL} ibpdfinfo ${PREFIX}/bin
 
 uninstall:

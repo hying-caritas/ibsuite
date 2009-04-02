@@ -21,6 +21,7 @@ clean:
 	rm -rf ${EXEC_NAME} *.o
 
 install:
+	mkdir -p ${PREFIX}/bin
 	${INSTALL} ibpdf2xml ${PREFIX}/bin
 
 uninstall:

@@ -2,6 +2,7 @@
 PREFIX=/usr/local
 
 install:
+	mkdir -p ${PREFIX}/bin
 	install ibchm2pdf ${PREFIX}/bin
 	install ibchm2imb ${PREFIX}/bin
 	install ibreformat ${PREFIX}/bin

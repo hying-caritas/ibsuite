@@ -80,6 +80,7 @@ if [[ ! -e ibhtml2img.xulapp ]]; then
 fi
 
 echo -n "Installing ibhtml2img to $PREFIX/lib/ibhtml2img ..."
+mkdir -p "$PREFIX/lib"
 $XULRUNNER --install-app ibhtml2img.xulapp "$PREFIX/lib/"
 echo ok
 
@@ -88,6 +89,7 @@ if [[ -e "$PREFIX/bin/ibhtml2img" ]]; then
 fi
 echo -n "Installing ibhtml2img binary in $PREFIX/bin ..."
 sed -e 's?PREFIX?'${PREFIX}'?g' ibhtml2img > ibhtml2img.tmp
+mkdir -p "$PREFIX/bin"
 install ibhtml2img.tmp $PREFIX/bin/ibhtml2img
 rm ibhtml2img.tmp
 echo ok

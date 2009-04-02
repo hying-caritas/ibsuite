@@ -80,6 +80,7 @@ if [[ ! -e ibhtml2pdf.xulapp ]]; then
 fi
 
 echo -n "Installing ibhtml2pdf to $PREFIX/lib/ibhtml2pdf ..."
+mkdir -p "$PREFIX/lib"
 ${XULRUNNER} --install-app ibhtml2pdf.xulapp "$PREFIX/lib/"
 echo ok
 
@@ -88,6 +89,7 @@ if [[ -e "$PREFIX/bin/ibhtml2pdf" ]]; then
 fi
 echo -n "Installing ibhtml2pdf binary in $PREFIX/bin ..."
 sed -e 's?PREFIX?'${PREFIX}'?g' ibhtml2pdf > ibhtml2pdf.tmp
+mkdir -p "$PREFIX/bin"
 install ibhtml2pdf.tmp $PREFIX/bin/ibhtml2pdf
 rm ibhtml2pdf.tmp
 echo ok
