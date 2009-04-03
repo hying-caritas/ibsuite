@@ -2,19 +2,19 @@
 PREFIX=/usr/local
 
 install:
-	mkdir -p ${PREFIX}/bin
-	install ibchm2pdf ${PREFIX}/bin
-	install ibchm2imb ${PREFIX}/bin
-	install ibreformat ${PREFIX}/bin
-	install ibimb2pdf ${PREFIX}/bin
-	install ibimgcat ${PREFIX}/bin
+	mkdir -p ${DESTDIR}/${PREFIX}/bin
+	install ibchm2pdf ${DESTDIR}/${PREFIX}/bin
+	install ibchm2imb ${DESTDIR}/${PREFIX}/bin
+	install ibreformat ${DESTDIR}/${PREFIX}/bin
+	install ibimb2pdf ${DESTDIR}/${PREFIX}/bin
+	install ibimgcat ${DESTDIR}/${PREFIX}/bin
 
 uninstall:
-	rm -rf ${PREFIX}/bin/ibchm2pdf
-	rm -rf ${PREFIX}/bin/ibchm2imb
-	rm -rf ${PREFIX}/bin/ibreformat
-	rm -rf ${PREFIX}/bin/ibimb2pdf
-	rm -rf ${PREFIX}/bin/ibimgcat
+	rm -rf ${DESTDIR}/${PREFIX}/bin/ibchm2pdf
+	rm -rf ${DESTDIR}/${PREFIX}/bin/ibchm2imb
+	rm -rf ${DESTDIR}/${PREFIX}/bin/ibreformat
+	rm -rf ${DESTDIR}/${PREFIX}/bin/ibimb2pdf
+	rm -rf ${DESTDIR}/${PREFIX}/bin/ibimgcat
 
 clean:
 

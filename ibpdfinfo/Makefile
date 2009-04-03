@@ -22,11 +22,11 @@ clean:
 	rm -rf ${EXEC_NAME} *.o
 
 install:
-	mkdir -p ${PREFIX}/bin
-	${INSTALL} ibpdfinfo ${PREFIX}/bin
+	mkdir -p ${DESTDIR}/${PREFIX}/bin
+	${INSTALL} ibpdfinfo ${DESTDIR}/${PREFIX}/bin
 
 uninstall:
-	rm -rf ${PREFIX}/bin/ibpdfinfo
+	rm -rf ${DESTDIR}/${PREFIX}/bin/ibpdfinfo
 
 distclean: clean
 	find . -name '*~' | xargs rm -f

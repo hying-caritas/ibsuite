@@ -4,11 +4,11 @@ all:
 	./build.sh xulapp
 
 install:
-	./install.sh -prefix ${PREFIX}
+	./install.sh -destdir ${DESTDIR} -prefix ${PREFIX}
 
 uninstall:
-	rm -rf ${PREFIX}/lib/ibhtml2pdf
-	rm -rf ${PREFIX}/bin/ibhtml2pdf
+	rm -rf ${DESTDIR}/${PREFIX}/lib/ibhtml2pdf
+	rm -rf ${DESTDIR}/${PREFIX}/bin/ibhtml2pdf
 
 clean:
 	rm -f *.xulapp

@@ -24,6 +24,7 @@ while [[ "$1" = -* ]]; do
     case "$1" in
         -build) BUILD=1 ;;
         -prefix) PREFIX="${2%/}" ; shift ;;
+	-destdir) DESTDIR="${2%/}" ; shift ;;
         *)
             echo "Unrecognized option. Please read the source."
             exit 1
@@ -80,17 +81,17 @@ if [[ ! -e ibhtml2pdf.xulapp ]]; then
 fi
 
 echo -n "Installing ibhtml2pdf to $PREFIX/lib/ibhtml2pdf ..."
-mkdir -p "$PREFIX/lib"
-${XULRUNNER} --install-app ibhtml2pdf.xulapp "$PREFIX/lib/"
+mkdir -p "$DESTDIR/$PREFIX/lib"
+${XULRUNNER} --install-app ibhtml2pdf.xulapp "$DESTDIR/$PREFIX/lib/"
 echo ok
 
-if [[ -e "$PREFIX/bin/ibhtml2pdf" ]]; then
-    rm "$PREFIX/bin/ibhtml2pdf"
+if [[ -e "$DESTDIR/$PREFIX/bin/ibhtml2pdf" ]]; then
+    rm "$DESTDIR/$PREFIX/bin/ibhtml2pdf"
 fi
 echo -n "Installing ibhtml2pdf binary in $PREFIX/bin ..."
 sed -e 's?PREFIX?'${PREFIX}'?g' ibhtml2pdf > ibhtml2pdf.tmp
-mkdir -p "$PREFIX/bin"
-install ibhtml2pdf.tmp $PREFIX/bin/ibhtml2pdf
+mkdir -p "$DESTDIR/$PREFIX/bin"
+install ibhtml2pdf.tmp $DESTDIR/$PREFIX/bin/ibhtml2pdf
 rm ibhtml2pdf.tmp
 echo ok
 

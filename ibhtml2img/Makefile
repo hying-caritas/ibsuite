@@ -4,12 +4,12 @@ all:
 	./build.sh xulapp
 
 install:
-	mkdir -p ${PREFIX}
-	./install.sh -prefix ${PREFIX}
+	mkdir -p ${DESTDIR}/${PREFIX}
+	./install.sh -destdir ${DESTDIR} -prefix ${PREFIX}
 
 uninstall:
-	rm -rf ${PREFIX}/lib/ibhtml2img
-	rm -rf ${PREFIX}/bin/ibhtml2img
+	rm -rf ${DESTDIR}/${PREFIX}/lib/ibhtml2img
+	rm -rf ${DESTDIR}/${PREFIX}/bin/ibhtml2img
 
 clean:
 	rm -f *.xulapp

@@ -21,11 +21,11 @@ clean:
 	rm -rf ${EXEC_NAME} *.o
 
 install:
-	mkdir -p ${PREFIX}/bin
-	${INSTALL} ibpdf2xml ${PREFIX}/bin
+	mkdir -p ${DESTDIR}/${PREFIX}/bin
+	${INSTALL} ibpdf2xml ${DESTDIR}/${PREFIX}/bin
 
 uninstall:
-	rm -rf ${PREFIX}/bin/ibpdf2xml
+	rm -rf ${DESTDIR}/${PREFIX}/bin/ibpdf2xml
 
 distclean: clean
 	find . -name '*~' | xargs rm -f

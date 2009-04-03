@@ -14,11 +14,11 @@ clean:
 	rm -rf ${EXEC} ${OBJS}
 
 install:
-	mkdir -p ${PREFIX}/bin
-	install iblineparser ${PREFIX}/bin
+	mkdir -p ${DESTDIR}/${PREFIX}/bin
+	install iblineparser ${DESTDIR}/${PREFIX}/bin
 
 uninstall:
-	rm -rf ${PREFIX}/bin/iblineparser
+	rm -rf ${DESTDIR}/${PREFIX}/bin/iblineparser
 
 distclean: clean
 	rm -f *~
