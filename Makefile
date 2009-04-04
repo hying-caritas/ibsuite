@@ -1,5 +1,10 @@
 VER = 0.1
 
+OS := $(shell uname -o)
+OS := $(subst GNU/Linux, linux, ${OS})
+OS := $(shell echo ${OS} | tr / _)
+MACH = $(shell uname -m)
+
 all:
 	${MAKE} -C poppler
 ifndef NO_XUL
@@ -54,31 +59,39 @@ uninstall:
 		${MAKE} -C $$m uninstall; \
 	done
 
+DIST_BASE = ibsuite-src-${VER}
+
 dist:
-	rm -f ibsuite-src-${VER}.tar.gz
-	rm -rf ibsuite-src-${VER}
-	mkdir ibsuite-src-${VER}
+	rm -f ${DIST_BASE}.tar.gz
+	rm -rf ${DIST_BASE}
+	mkdir ${DIST_BASE}
 	for m in ibpy ibhtml2img ibhtml2pdf iblineparser ibpdf2xml \
 		ibpdfinfo ibtools poppler scripts doc; do \
-		mkdir ibsuite-src-${VER}/$$m; \
-		cp -r $$m/* ibsuite-src-${VER}/$$m; \
+		mkdir ${DIST_BASE}/$$m; \
+		cp -r $$m/* ${DIST_BASE}/$$m; \
 	done
 	for f in autogen.sh configure COPYING Makefile README; do \
-		cp $$f ibsuite-src-${VER}; \
+		cp $$f ${DIST_BASE}; \
 	done
-	tar -czf ibsuite-src-${VER}.tar.gz ibsuite-src-${VER}
-	rm -rf ibsuite-src-${VER}
+	tar -czf ${DIST_BASE}.tar.gz ${DIST_BASE}
+	rm -rf ${DIST_BASE}
+
+ifndef NO_POPPLER
+BDIST_BASE = ibsuite-poppler-${VER}.${OS}.${MACH}
+else
+BDIST_BASE = ibsuite-${VER}.${OS}.${MACH}
+endif
 
 bdist:
-	rm -f ibsuite-${VER}.tar.gz
-	rm -rf ibsuite-${VER}
-	mkdir ibsuite-${VER}
+	rm -f ${BDIST_BASE}.tar.gz
+	rm -rf ${BDIST_BASE}
+	mkdir ${BDIST_BASE}
 	for m in ${INSTALL_MOD}; do \
-		${MAKE} -C $$m install DESTDIR=`pwd`/ibsuite-${VER}/root; \
+		${MAKE} -C $$m install DESTDIR=`pwd`/${BDIST_BASE}/root; \
 	done
-	mkdir ibsuite-${VER}/ibpy
-	cp -r ibpy/ibpy ibsuite-${VER}/ibpy
-	cp ibpy/setup.py ibsuite-${VER}/ibpy
-	cp scripts/install.sh ibsuite-${VER}
-	tar -czf ibsuite-${VER}.tar.gz ibsuite-${VER}
-	rm -rf ibsuite-${VER}
+	mkdir ${BDIST_BASE}/ibpy
+	cp -r ibpy/ibpy ${BDIST_BASE}/ibpy
+	cp ibpy/setup.py ${BDIST_BASE}/ibpy
+	cp scripts/install.sh ${BDIST_BASE}
+	tar -czf ${BDIST_BASE}.tar.gz ${BDIST_BASE}
+	rm -rf ${BDIST_BASE}
