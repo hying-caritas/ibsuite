@@ -10,6 +10,9 @@ endif
 	${MAKE} -C ibpdfinfo
 	${MAKE} -C ibpdf2xml
 
+doc:
+	${MAKE} -C doc
+
 clean:
 	${MAKE} -C ibhtml2pdf clean
 	${MAKE} -C ibhtml2img clean
