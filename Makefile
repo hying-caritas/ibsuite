@@ -33,41 +33,49 @@ distclean:
 	${MAKE} -C ibpdf2xml distclean
 	rm -f *~
 
-install:
-	${MAKE} -C poppler install
+INSTALL_MOD := iblineparser ibpdfinfo ibpdf2xml ibtools
 ifndef NO_XUL
-	${MAKE} -C ibhtml2pdf install
-	${MAKE} -C ibhtml2img install
+INSTALL_MOD := ${INSTALL_MOD} ibhtml2pdf ibhtml2img
 endif
-	${MAKE} -C iblineparser install
-	${MAKE} -C ibpdfinfo install
-	${MAKE} -C ibpdf2xml install
-	${MAKE} -C ibtools install
-	${MAKE} -C ibpy install
+ifndef NO_POPPLER
+INSTALL_MOD := ${INSTALL_MOD} poppler
+endif
+
+install:
+	for m in ${INSTALL_MOD} ibpy; do \
+		${MAKE} -C $$m install; \
+	done
 
 uninstall:
-ifndef NO_XUL
-	${MAKE} -C ibhtml2pdf uninstall
-	${MAKE} -C ibhtml2img uninstall
-endif
-	${MAKE} -C iblineparser uninstall
-	${MAKE} -C ibpdfinfo uninstall
-	${MAKE} -C ibpdf2xml uninstall
-	${MAKE} -C ibtools uninstall
-	${MAKE} -C ibpy uninstall
-	${MAKE} -C poppler uninstall
+	for m in ${INSTALL_MOD} ibpy; do \
+		${MAKE} -C $$m uninstall; \
+	done
 
 dist:
+	rm -f ibsuite-src-${VER}.tar.gz
+	rm -rf ibsuite-src-${VER}
+	mkdir ibsuite-src-${VER}
+	for m in ibpy ibhtml2img ibhtml2pdf iblineparser ibpdf2xml \
+		ibpdfinfo ibtools poppler; do \
+		mkdir ibsuite-src-${VER}/$$m; \
+		cp -r $$m/* ibsuite-src-${VER}/$$m; \
+	done
+	for f in configure Makefile README; do \
+		cp $$f ibsuite-src-${VER}; \
+	done
+	tar -czf ibsuite-src-${VER}.tar.gz ibsuite-src-${VER}
+	rm -rf ibsuite-src-${VER}
+
+bdist:
 	rm -f ibsuite-${VER}.tar.gz
 	rm -rf ibsuite-${VER}
 	mkdir ibsuite-${VER}
-	for m in ibpy ibhtml2img ibhtml2pdf iblineparser ibpdf2xml \
-		ibpdfinfo ibtools poppler; do \
-		mkdir ibsuite-${VER}/$$m; \
-		cp -r $$m/* ibsuite-${VER}/$$m; \
+	for m in ${INSTALL_MOD}; do \
+		${MAKE} -C $$m install DESTDIR=`pwd`/ibsuite-${VER}/root; \
 	done
-	for f in configure Makefile README; do \
-		cp $$f ibsuite-${VER}; \
-	done
+	mkdir ibsuite-${VER}/ibpy
+	cp -r ibpy/ibpy ibsuite-${VER}/ibpy
+	cp ibpy/setup.py ibsuite-${VER}/ibpy
+	cp scripts/install.sh ibsuite-${VER}
 	tar -czf ibsuite-${VER}.tar.gz ibsuite-${VER}
 	rm -rf ibsuite-${VER}
