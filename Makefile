@@ -59,11 +59,11 @@ dist:
 	rm -rf ibsuite-src-${VER}
 	mkdir ibsuite-src-${VER}
 	for m in ibpy ibhtml2img ibhtml2pdf iblineparser ibpdf2xml \
-		ibpdfinfo ibtools poppler; do \
+		ibpdfinfo ibtools poppler scripts doc; do \
 		mkdir ibsuite-src-${VER}/$$m; \
 		cp -r $$m/* ibsuite-src-${VER}/$$m; \
 	done
-	for f in configure Makefile README; do \
+	for f in autogen.sh configure COPYING Makefile README; do \
 		cp $$f ibsuite-src-${VER}; \
 	done
 	tar -czf ibsuite-src-${VER}.tar.gz ibsuite-src-${VER}
