@@ -24,3 +24,4 @@ poppler.pc
 stamp-h1
 gtk-doc.make
 *.o
+m4
