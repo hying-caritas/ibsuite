@@ -19,7 +19,8 @@ debug = False
 ext_map = {
     '.pdf' : 'pdf',
     '.imb' : 'imb',
-    '.lrf' : 'lrf'
+    '.lrf' : 'lrf',
+    '.djvu' : 'djvu',
 }
 
 def file_name_to_format(fn):

@@ -13,6 +13,8 @@ import pdf
 import pdfinfo
 import imb
 import imbinfo
+import djvu
+import djvuinfo
 
 def get_input_info(config):
     iformat = config.input_format
@@ -20,6 +22,8 @@ def get_input_info(config):
         info_parser = pdfinfo.PDFInfoParser(config)
     elif iformat == 'imb':
         info_parser = imbinfo.ImbInfoParser(config)
+    elif iformat == 'djvu':
+        info_parser = djvuinfo.DJVUInfoParser(config)
     else:
         print 'Invalid input format: %s' % (iformat)
         sys.exit(-1)
@@ -30,3 +34,5 @@ def create_input_to_ppm(config):
         return pdf.create_pdf_to_ppm(config)
     elif config.input_format == 'imb':
         return imb.IMBToPPM(config)
+    elif config.input_format == 'djvu':
+        return djvu.DJVUToPPM(config)
