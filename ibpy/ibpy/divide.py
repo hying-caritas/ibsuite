@@ -1290,6 +1290,8 @@ class SimplePageDivider(object):
         page.render(pimg_ref)
         segs = []
         pg_lft = page.bbox[0]
+        if len(page.lines):
+            page.lines[0].bl = 0
         for ln in page.lines:
             seg = ln.to_seg()
             seg.out_bl = seg.bl
