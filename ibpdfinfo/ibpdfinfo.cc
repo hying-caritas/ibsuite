@@ -99,6 +99,9 @@ static void fputs_quote(char *s, FILE *f)
 		case '>':
 			fputs("&gt;", f);
 			break;
+		case '&':
+			fputs("&amp;", f);
+			break;
 		default:
 			fputc(*p, f);
 			break;
