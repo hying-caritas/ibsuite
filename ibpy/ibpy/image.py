@@ -188,21 +188,33 @@ class PostProc(object):
         object.__init__(self)
         self.colors = config.colors
         self.rotate = config.rotate
+        self.gamma = config.gamma
     def convert(self, pimg_ref, out_file_name = None):
+        def do_gamma(infn):
+            gmfn = temp_file_name('.png')
+            cmd = ['convert', '-gamma', '%.2f' % (self.gamma,),
+                   '-depth', '8', infn, gmfn]
+            check_call(cmd)
+            return gmfn
+
+        if self.gamma > 0.001:
+            gmfn = do_gamma(pimg_ref.get_file_name())
+            pimg_ref = pimg_ref.derive(file_name = gmfn)
+
         if out_file_name is None:
             out_file_name = temp_file_name('.png')
         proc = False
         cmd = ['convert']
         if self.colors < 256:
             scolors = '%d' % (self.colors,)
-            cmd.extend(['-colors', scolors, '-depth', '8'])
+            cmd.extend(['-colors', scolors])
             proc = True
         if self.rotate:
             cmd.extend(['-rotate', '-90'])
             proc = True
         if not proc:
             return pimg_ref
-        cmd.extend([pimg_ref.get_file_name(), out_file_name])
+        cmd.extend(['-depth', '8', pimg_ref.get_file_name(), out_file_name])
         check_call(cmd)
         return pimg_ref.derive(file_name = out_file_name)
 

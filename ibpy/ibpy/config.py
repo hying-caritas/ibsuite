@@ -111,6 +111,7 @@ config_options = {
     'opedge_ex' : (float, None, None, 'output page edge expanded'),
     'colors' : (int, 4, None, 'Color number for output image'),
     'rotate' : (str2bool, False, None, 'Rotate output image'),
+    'gamma' : (float, 0, None, 'Level of gamma correction'),
     'out_file_name' : (str, None, '-o', 'Output file name'),
     'out_format' : (str, None, None, 'Output format'),
     'title' : (str, None, None, 'Book title'),
