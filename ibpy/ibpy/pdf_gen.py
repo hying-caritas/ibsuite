@@ -18,12 +18,19 @@ class PDFGenerator(object):
         self.title = config.title
         self.author = config.author
         self.bookmarks = config.bookmarks
-    def generate(self, img_files, page_map):
+    def generate(self, img_files, page_map = None):
+        def map_page_num(pm, pn):
+            if pm is None:
+                return pn
+            elif pm.has_key(pn):
+                return pm[pn] - 1
+            else:
+                return -1
         def gen_page_to_bm_map(bms, pm):
             p2bm = {}
             for bm in bms:
-                if page_map.has_key(bm.page):
-                    opn = page_map[bm.page] - 1
+                opn = map_page_num(pm, bm.page)
+                if opn != -1:
                     if not p2bm.has_key(opn):
                         p2bm[opn] = []
                     p2bm[opn].append(bm.title)

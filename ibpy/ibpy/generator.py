@@ -10,6 +10,15 @@
 from pylrs import pylrs
 import imb
 
+def map_page_num(page_map, pn):
+    if page_map is None:
+        return pn
+    elif page_map.has_key(pn):
+        return page_map[pn] - 1
+    else:
+        return -1
+
+
 class NullGenerator(object):
     def __init__(self, config):
         object.__init__(self)
@@ -25,7 +34,7 @@ class LRFGenerator(object):
         self.title = config.title
         self.author = config.author
         self.bookmarks = config.bookmarks
-    def generate(self, img_files, page_map):
+    def generate(self, img_files, page_map = None):
         if self.rotate:
             oh, ow = self.out_size
         else:
@@ -48,10 +57,9 @@ class LRFGenerator(object):
                                     x1=ow, y1=oh,
                                     blockStyle=block_style)
             images.append(image)
-        page_map = page_map
         for bm in self.bookmarks:
-            if page_map.has_key(bm.page):
-                opn = page_map[bm.page]
+            opn = map_page_num(page_map, bm.page)
+            if opn != -1:
                 book.addTocEntry(bm.title, images[opn-1])
         book.renderLrf(self.out_file_name)
 
@@ -62,15 +70,15 @@ class IMBGenerator(object):
         self.title = config.title
         self.author = config.author
         self.bookmarks = config.bookmarks
-    def generate(self, img_files, page_map):
+    def generate(self, img_files, page_map = None):
         book = imb.Book(title=self.title, author=self.author)
         pages = []
         for fn in img_files:
             page = book.add_page(fn)
             pages.append(page)
         for bm in self.bookmarks:
-            if page_map.has_key(bm.page):
-                opn = page_map[bm.page]
+            opn = map_page_num(page_map, bm.page)
+            if opn != -1:
                 book.add_toc_entry(bm.title, pages[opn-1])
         book.save(self.out_file_name)
 
