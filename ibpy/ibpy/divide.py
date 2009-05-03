@@ -737,6 +737,13 @@ class BasicPage(object):
             else:
                 self.bbox = map(ipxl2norm, ws[1:])
         self.set_space()
+    def merge_all_lines(self):
+        if len(self.lines) == 0:
+            return
+        rln = self.lines[0]
+        for ln in self.lines[1:]:
+            rln.merge(ln)
+        self.lines = [rln]
     def add_text_formats(self):
         doc = self.doc
         for ln in self.lines:
@@ -1239,6 +1246,26 @@ class PageParser(object):
         self.doc.stat_page(page)
     def end_stat(self):
         self.doc.end_stat()
+
+class SimplePageParser(object):
+    def __init__(self, config):
+        object.__init__(self)
+        self.doc = Doc(config)
+    def parse(self, pimg_ref):
+        page = Page(self.doc, pimg_ref.page_num)
+        page.parse(pimg_ref)
+        page.merge_all_lines()
+        return page
+    def stat_page(self, page):
+        self.doc.stat_page(page)
+    def end_stat(self):
+        self.doc.end_stat()
+
+def create_page_parser(config):
+    if config.page_parser == 'simple':
+        return SimplePageParser(config)
+    else:
+        return PageParser(config)
 
 class PageHLParser(object):
     def __init__(self, config):

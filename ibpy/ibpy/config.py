@@ -43,6 +43,13 @@ oprof_prs505l = {
     'colors' : 8,
 }
 
+oprof_x61t = {
+    'out_width' : 768,
+    'out_height' : 1024,
+    'margin' : 2,
+    'colors' : 256,
+}
+
 pprof_divide2 = {
     'divide' : 2,
     'fix_figure_by_vspace' : True,
@@ -72,6 +79,7 @@ iprof_img = {
 profiles = {
     'prs505p' : oprof_prs505p,
     'prs505l' : oprof_prs505l,
+    'x61t' : oprof_x61t,
     'divide2' : pprof_divide2,
     'resize' : pprof_resize,
     'repage' : pprof_repage,
@@ -109,6 +117,8 @@ config_options = {
     'parsing_dpi' : (int, 180, None, 'DPI used to parsing image'),
     'rendering_dpi' : (int, 360, None, 'DPI used to render result image'),
     'opedge_ex' : (float, None, None, 'output page edge expanded'),
+    'page_parser' : (str, None, None, "Page parser"),
+    'assembler' : (str, None, None, "Assembler"),
     'colors' : (int, 4, None, 'Color number for output image'),
     'rotate' : (str2bool, False, None, 'Rotate output image'),
     'gamma' : (float, 0, None, 'Level of gamma correction'),
@@ -235,7 +245,8 @@ class Config(object):
         if self.input_fn is None:
             print 'Please specify input file name!'
             sys.exit(-1)
-        (input_fn_base, input_ext) = os.path.splitext(self.input_fn)
+        input_fn = os.path.basename(self.input_fn)
+        (input_fn_base, input_ext) = os.path.splitext(input_fn)
 
         self.tmp_dir = tempfile.mkdtemp('ibpy')
 
@@ -248,7 +259,7 @@ class Config(object):
                     (self.input_fn, self.out_format)
 
         if self.title == '':
-            self.title = input_fn_base
+            self.title = input_fn_base.decode('utf-8')
 
         if self.opedge_ex is None:
             if self.dilate:
