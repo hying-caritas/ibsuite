@@ -106,6 +106,7 @@ c. python, python-imaging
 d. imagemagick
 e. for HTML/CHM support: python-chm, xulrunner
 f. for scanned book: unpaper
+g. for PDF generating: python-reportlab
 
 Build:
 
