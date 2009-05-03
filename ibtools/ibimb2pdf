@@ -1,62 +1,38 @@
 #!/usr/bin/python
 
-from subprocess import call
-from ibpy import imb
-import shutil
-import tempfile
-import os.path
 import sys
-from optparse import OptionParser
+import Image
 
-def convert(pdf_fn, imb_fn):
-    book = imb.Book()
-    book.load(imb_fn)
-    tmp_dir = tempfile.mkdtemp("ibimb2pdf")
-    tif_imgs = []
-    for page in book.pages:
-        img_fn = page.img_fn
-        bimg_fn = os.path.basename(img_fn)
-        s, e = os.path.splitext(bimg_fn)
-        d_bimg_fn = s + '.tif'
-        d_img_fn = os.path.join(tmp_dir, d_bimg_fn)
-        if e.startswith('.tif'):
-            shutil.copyfile(img_fn, d_img_fn)
-        else:
-            call(['convert', img_fn, d_img_fn])
-        tif_imgs.append(d_bimg_fn)
-    
-    cwd = os.getcwd()
-    os.chdir(tmp_dir)
+from ibpy import pdf_gen, imb
 
-    cmdline = ['tiffcp']
-    cmdline.extend(tif_imgs)
-    tif_fn = os.path.basename(pdf_fn) + '.tif'
-    abs_tif_fn = os.path.join(tmp_dir, tif_fn)
-    cmdline.append(tif_fn)
-    call(cmdline)
+class Config(object):
+    def __init__(self):
+        object.__init__(self)
 
-    os.chdir(cwd)
-    call(['tiff2pdf', '-nz', '-o', pdf_fn, abs_tif_fn])
+def imb2pdf(in_fn, out_fn):
+    ibook = imb.Book()
+    ibook.load(in_fn)
+    if len(ibook.pages) == 0:
+        return
+    img_fns = [ipage.img_fn for ipage in ibook.pages]
+    img = Image.open(ibook.pages[0].img_fn)
+    print dir(ibook)
+    config = Config()
+    config.title = ibook.title
+    config.author = ibook.author
+    config.bookmarks = ibook.toc_entries
+    config.out_size = img.size
+    config.rotate = 0
+    config.out_file_name = out_fn
 
-    shutil.rmtree(tmp_dir)
+    pg = pdf_gen.PDFGenerator(config)
+    pg.generate(img_fns)
 
-def main():
-    usage = 'Usage: %s [options] <file.imb>' % (os.path.basename(sys.argv[0]),)
-    parser = OptionParser(usage=usage)
-    parser.add_option('-o', '--output', dest="pdf_fn",
-                      help="Output PDF file name")
-    options, args = parser.parse_args()
-    if len(args) != 1:
-        parser.print_help()
-        return -1
-    imb_fn = args[0]
-    if options.pdf_fn:
-        pdf_fn = options.pdf_fn
-    else:
-        s, ext = os.path.splitext(imb_fn)
-        pdf_fn = s + '.pdf'
-    convert(pdf_fn, imb_fn)
-    return 0
+def usage():
+    print 'Usage: %s <input file>.imb <output file>.pdf' % (sys.argv[0],)
+    sys.exit(-1)
 
 if __name__ == '__main__':
-    main()
+    if len(sys.argv) != 3:
+        usage()
+    imb2pdf(sys.argv[1], sys.argv[2])
