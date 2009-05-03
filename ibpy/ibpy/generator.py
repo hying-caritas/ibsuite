@@ -79,5 +79,8 @@ def create_generator(config):
         return LRFGenerator(config)
     elif config.out_format == 'imb':
         return IMBGenerator(config)
+    elif config.out_format == 'pdf':
+        import pdf_gen
+        return pdf_gen.PDFGenerator(config)
     else:
         return NullGenerator(config)
