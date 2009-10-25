@@ -213,6 +213,13 @@ GBool SplashFTFont::makeGlyph(int c, int xFrac, int yFrac,
     return gTrue;
   }
 
+  if (slot->format == FT_GLYPH_FORMAT_OUTLINE) {
+    FT_Pos str;
+    str = FT_MulFix(ff->face->units_per_EM,
+                    ff->face->size->metrics.y_scale) / 24;
+    FT_Outline_Embolden(&slot->outline, str);
+  }
+
   if (FT_Render_Glyph(slot, aa ? ft_render_mode_normal
 		               : ft_render_mode_mono)) {
     return gFalse;
