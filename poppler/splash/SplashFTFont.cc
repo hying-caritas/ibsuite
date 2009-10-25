@@ -24,6 +24,8 @@
 #include "SplashFTFontFile.h"
 #include "SplashFTFont.h"
 
+int splash_bold = 0;
+
 //------------------------------------------------------------------------
 
 static int glyphPathMoveTo(const FT_Vector *pt, void *path);
@@ -213,7 +215,7 @@ GBool SplashFTFont::makeGlyph(int c, int xFrac, int yFrac,
     return gTrue;
   }
 
-  if (slot->format == FT_GLYPH_FORMAT_OUTLINE) {
+  if (splash_bold && slot->format == FT_GLYPH_FORMAT_OUTLINE) {
     FT_Pos str;
     str = FT_MulFix(ff->face->units_per_EM,
                     ff->face->size->metrics.y_scale) / 24;

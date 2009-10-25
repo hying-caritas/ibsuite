@@ -20,6 +20,8 @@
 #include "splash/Splash.h"
 #include "SplashOutputDev.h"
 
+extern int splash_bold;
+
 #define PPM_FILE_SZ 512
 
 static int firstPage = 1;
@@ -84,6 +86,8 @@ static const ArgDesc argDesc[] = {
   {"-upw",    argString,   userPassword,   sizeof(userPassword),
    "user password (for encrypted files)"},
   
+  {"-b",      argFlag,     &splash_bold,   0,
+   "make font appers bold"},
   {"-q",      argFlag,     &quiet,         0,
    "don't print any messages or errors"},
   {"-v",      argFlag,     &printVersion,  0,
