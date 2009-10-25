@@ -21,12 +21,16 @@ class PDFToPPM(object):
         makedirs(self.tmpd)
         self.output_prefix = '%s/out' % (self.tmpd,)
         self.dpi = config.rendering_dpi
+        self.embolden = config.embolden
     def get_image(self, page_num):
         spage_num = '%d' % (page_num,)
         sdpi = '%d' % (self.dpi,)
-        check_call(['pdftoppm', '-r', sdpi, '-f', spage_num,
-                    '-l', spage_num, '-gray', self.pdf_fn,
-                    self.output_prefix])
+        cmdline = ['pdftoppm', '-r', sdpi, '-f', spage_num,
+                   '-l', spage_num, '-gray']
+        if self.embolden:
+            cmdline.append('-b')
+        cmdline.extend([self.pdf_fn, self.output_prefix])
+        check_call(cmdline)
         fns = os.listdir(self.tmpd)
         fns = [os.path.join(self.tmpd, fn) for fn in fns]
         re_img_fn = re.compile('%s-0*%d.pgm' % (self.output_prefix, page_num))
