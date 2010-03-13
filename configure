@@ -1,5 +1,0 @@
-#!/bin/sh
-
-set -e
-
-(cd poppler; ./configure --disable-poppler-qt --disable-poppler-qt4 --disable-gtk-test --disable-cairo-output --disable-abiword-output)

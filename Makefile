@@ -6,7 +6,6 @@ OS := $(shell echo ${OS} | tr / _)
 MACH = $(shell uname -m)
 
 all:
-	${MAKE} -C poppler
 ifndef NO_XUL
 	${MAKE} -C ibhtml2pdf
 	${MAKE} -C ibhtml2img
@@ -22,34 +21,25 @@ clean:
 	${MAKE} -C iblineparser clean
 	${MAKE} -C ibpy clean
 
-poppler_clean:
-	${MAKE} -C poppler clean
-
-cleanall: clean poppler_clean
-
 distclean:
-	-[ -f poppler/Makefile ] && ${MAKE} -C poppler distclean
 	${MAKE} -C ibhtml2pdf distclean
 	${MAKE} -C ibhtml2img distclean
 	${MAKE} -C iblineparser distclean
 	${MAKE} -C ibpy distclean
 	rm -f *~
 
-INSTALL_MOD := iblineparser ibtools
+INSTALL_MOD := iblineparser ibtools ibpy
 ifndef NO_XUL
 INSTALL_MOD := ${INSTALL_MOD} ibhtml2pdf ibhtml2img
 endif
-ifndef NO_POPPLER
-INSTALL_MOD := ${INSTALL_MOD} poppler
-endif
 
 install:
-	for m in ${INSTALL_MOD} ibpy; do \
+	for m in ${INSTALL_MOD}; do \
 		${MAKE} -C $$m install; \
 	done
 
 uninstall:
-	for m in ${INSTALL_MOD} ibpy; do \
+	for m in ${INSTALL_MOD}; do \
 		${MAKE} -C $$m uninstall; \
 	done
 
@@ -60,7 +50,7 @@ dist:
 	rm -rf ${DIST_BASE}
 	mkdir ${DIST_BASE}
 	for m in ibpy ibhtml2img ibhtml2pdf iblineparser \
-		ibtools poppler scripts doc; do \
+		ibtools scripts doc; do \
 		mkdir ${DIST_BASE}/$$m; \
 		cp -r $$m/* ${DIST_BASE}/$$m; \
 	done
@@ -70,11 +60,7 @@ dist:
 	tar -czf ${DIST_BASE}.tar.gz ${DIST_BASE}
 	rm -rf ${DIST_BASE}
 
-ifndef NO_POPPLER
-BDIST_BASE = ibsuite-poppler-${VER}.${OS}.${MACH}
-else
 BDIST_BASE = ibsuite-${VER}.${OS}.${MACH}
-endif
 
 bdist:
 	rm -f ${BDIST_BASE}.tar.gz
