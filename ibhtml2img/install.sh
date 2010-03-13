@@ -34,7 +34,7 @@ done
 
 # Find an appropriate xulrunner binary
 XULRUNNER=''
-for xr in xulrunner-1.9 xulrunner; do
+for xr in xulrunner-1.9.1 xulrunner-1.9 xulrunner; do
     XRTMP=`which $xr`
     if [ -n "$XRTMP" -a -x "$XRTMP" ]; then
 	if expr `$XRTMP --gre-version | cut -d . -f 1,2` '>=' 1.9 > /dev/null; then
