@@ -19,10 +19,6 @@ ibhtml2pdf:
 iblineparser:
 	parser input image, extract line information
 
-ibpdfinfo:
-	get some meta-information from pdf file, such as title,
-	author, table of contents etc.
-
 ibpy:
 
 	python module, which is the driver of the whole system, it
@@ -102,7 +98,7 @@ Pre-requirement:
 
 a. gcc, g++, bash, make
 b. libfontconfig-dev, libnetpbm-dev, libgtk-dev
-c. python, python-imaging
+c. python, python-imaging, python-poppler
 d. imagemagick
 e. for HTML/CHM support: python-chm, xulrunner
 f. for scanned book: unpaper

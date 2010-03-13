@@ -12,7 +12,6 @@ ifndef NO_XUL
 	${MAKE} -C ibhtml2img
 endif
 	${MAKE} -C iblineparser
-	${MAKE} -C ibpdfinfo
 	${MAKE} -C ibpdf2xml
 
 doc:
@@ -22,7 +21,6 @@ clean:
 	${MAKE} -C ibhtml2pdf clean
 	${MAKE} -C ibhtml2img clean
 	${MAKE} -C iblineparser clean
-	${MAKE} -C ibpdfinfo clean
 	${MAKE} -C ibpy clean
 	${MAKE} -C ibpdf2xml clean
 
@@ -36,12 +34,11 @@ distclean:
 	${MAKE} -C ibhtml2pdf distclean
 	${MAKE} -C ibhtml2img distclean
 	${MAKE} -C iblineparser distclean
-	${MAKE} -C ibpdfinfo distclean
 	${MAKE} -C ibpy distclean
 	${MAKE} -C ibpdf2xml distclean
 	rm -f *~
 
-INSTALL_MOD := iblineparser ibpdfinfo ibpdf2xml ibtools
+INSTALL_MOD := iblineparser ibpdf2xml ibtools
 ifndef NO_XUL
 INSTALL_MOD := ${INSTALL_MOD} ibhtml2pdf ibhtml2img
 endif
@@ -66,7 +63,7 @@ dist:
 	rm -rf ${DIST_BASE}
 	mkdir ${DIST_BASE}
 	for m in ibpy ibhtml2img ibhtml2pdf iblineparser ibpdf2xml \
-		ibpdfinfo ibtools poppler scripts doc; do \
+		ibtools poppler scripts doc; do \
 		mkdir ${DIST_BASE}/$$m; \
 		cp -r $$m/* ${DIST_BASE}/$$m; \
 	done
