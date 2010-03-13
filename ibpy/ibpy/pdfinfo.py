@@ -1,5 +1,5 @@
 #
-# Copyright 2009 Huang Ying <huang.ying.caritas@gmail.com>
+# Copyright 2009-2010 Huang Ying <huang.ying.caritas@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -7,9 +7,7 @@
 # (at your option) any later version.
 #
 
-from xml.sax import saxutils
-from xml.sax import make_parser
-from xml.sax.handler import feature_namespaces, ContentHandler
+import poppler
 
 from util import *
 
@@ -26,65 +24,43 @@ class PDFMeta(object):
         self.author = author
         self.pages = pages
 
-class PDFMInfoHandler(ContentHandler):
-    def __init__(self):
-        ContentHandler.__init__(self)
-        self.bookmarks = []
-        self.bm_stack = []
-        self.doc_title = ''
-        self.author = ''
-        self.pages = 0
-    def startElement(self, name, attrs):
-        if name == 'bookmark':
-            bm = Bookmark()
-            self.bookmarks.append(bm)
-            self.bm_stack.append(bm)
-        else:
-            self.curr_elem = name
-    def endElement(self, name):
-        if name == 'bookmark':
-            del self.bm_stack[-1]
-        self.curr_elem = None
-    def characters(self, ch):
-        if len(self.bm_stack) != 0:
-            bm = self.bm_stack[-1]
-            if self.curr_elem == 'title':
-                bm.title = ch
-            elif self.curr_elem == 'page':
-                bm.page = int(ch)
-        else:
-            if self.curr_elem == 'doc_title':
-                self.doc_title = ch
-            elif self.curr_elem == 'author':
-                self.author = ch
-            elif self.curr_elem == 'pages':
-                self.pages = int(ch)
-    def get_info(self):
-        return (PDFMeta(self.doc_title, self.author, self.pages),
-                self.bookmarks)
-
-def parse(f):
-    parser = make_parser()
-    parser.setFeature(feature_namespaces, 0)
-
-    dh = PDFMInfoHandler()
-    parser.setContentHandler(dh)
-
-    parser.parse(f)
-
-    return dh.get_info()
-
-def get_info(pdf_fn):
-    p = Popen(['ibpdfinfo', pdf_fn], stdout = PIPE)
-    info = parse(p.stdout)
-    return info
-
 class PDFInfoParser(object):
     def __init__(self, config):
         object.__init__(self)
         self.input_fn = config.input_fn
+    def get_bookmarks(self, doc):
+        def collect(idx):
+            has_next = True
+            while has_next:
+                act = idx.get_action()
+                if type(act) is poppler.ActionGotoDest:
+                    dest =  act.dest
+                    bookmarks.append(Bookmark(act.title, dest.page_num))
+                    cidx = idx.get_child()
+                    if cidx:
+                        collect(cidx)
+                has_next = idx.next()
+        bookmarks = []
+        try:
+            idx = poppler.IndexIter(doc)
+        except:
+            idx = None
+        if idx:
+            collect(idx)
+        return bookmarks
     def parse(self):
-        return get_info(self.input_fn)
+        doc = poppler.document_new_from_file('file://' +
+                                             os.path.abspath(self.input_fn),
+                                             None);
+        title = doc.get_property('title')
+        author = doc.get_property('author')
+        if title is None:
+            title = ''
+        if author is None:
+            author = ''
+        meta = PDFMeta(title, author, doc.get_n_pages())
+        bookmarks = self.get_bookmarks(doc)
+        return (meta, bookmarks)
 
 def print_bookmarks(bms):
     for bm in bms:
@@ -92,8 +68,13 @@ def print_bookmarks(bms):
 
 if __name__ == '__main__':
     import sys
-    info = get_info(sys.argv[1])
+    config = Bookmark()
+    config.input_fn = sys.argv[1]
+    parser = PDFInfoParser(config)
+    doc_info = parser.parse()
+    info = doc_info[0]
+    bms = doc_info[1]
     print info.doc_title.encode('utf-8')
     print info.author.encode('utf-8')
     print info.pages
-    print_bookmarks(info.bookmarks)
+    print_bookmarks(bms)
