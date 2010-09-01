@@ -50,6 +50,13 @@ oprof_x61t = {
     'colors' : 256,
 }
 
+oprof_kdx = {
+    'out_width' : 824,
+    'out_height' : 1200,
+    'margin' : 2,
+    'colors' : 16,
+}
+
 pprof_divide2 = {
     'divide' : 2,
     'fix_figure_by_vspace' : True,
@@ -80,6 +87,7 @@ profiles = {
     'prs505p' : oprof_prs505p,
     'prs505l' : oprof_prs505l,
     'x61t' : oprof_x61t,
+    'kdx' : oprof_kdxp,
     'divide2' : pprof_divide2,
     'resize' : pprof_resize,
     'repage' : pprof_repage,
