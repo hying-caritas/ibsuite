@@ -76,6 +76,12 @@ pprof_repage = {
     'unpaper' : 'null',
 }
 
+pprof_crop = {
+    'divide' : 1,
+    'page_parser' : 'simple',
+    'assembler' : 'simple'
+}
+
 iprof_img = {
     'divide' : 1,
     'dilate' : True,
@@ -91,6 +97,7 @@ profiles = {
     'divide2' : pprof_divide2,
     'resize' : pprof_resize,
     'repage' : pprof_repage,
+    'crop' : pprof_crop,
     'img' : iprof_img,
 }
 
