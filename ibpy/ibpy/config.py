@@ -79,7 +79,9 @@ pprof_repage = {
 pprof_crop = {
     'divide' : 1,
     'page_parser' : 'simple',
-    'assembler' : 'simple'
+    'assembler' : 'simple',
+    'page_hl_parser' : 'crop',
+    'out_center' : True,
 }
 
 iprof_img = {
@@ -93,7 +95,7 @@ profiles = {
     'prs505p' : oprof_prs505p,
     'prs505l' : oprof_prs505l,
     'x61t' : oprof_x61t,
-    'kdx' : oprof_kdxp,
+    'kdx' : oprof_kdx,
     'divide2' : pprof_divide2,
     'resize' : pprof_resize,
     'repage' : pprof_repage,
@@ -133,12 +135,14 @@ config_options = {
     'rendering_dpi' : (int, 360, None, 'DPI used to render result image'),
     'opedge_ex' : (float, None, None, 'output page edge expanded'),
     'page_parser' : (str, None, None, "Page parser"),
+    'page_hl_parser' : (str, None, None, "High-level page parser"),
     'assembler' : (str, None, None, "Assembler"),
     'colors' : (int, 4, None, 'Color number for output image'),
     'rotate' : (str2bool, False, None, 'Rotate output image'),
     'gamma' : (float, 0, None, 'Level of gamma correction'),
     'out_file_name' : (str, None, '-o', 'Output file name'),
     'out_format' : (str, None, None, 'Output format'),
+    'out_center' : (str2bool, False, None, 'Put output segment in center'),
     'title' : (str, None, None, 'Book title'),
     'author' : (str, None, None, 'Book author'),
     'first_page' : (int, 1, "-f", 'First page'),

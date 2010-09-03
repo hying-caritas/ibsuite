@@ -207,6 +207,7 @@ class SimpleAssembler(object):
         self.img.paste(255, [0, 0, ow, oh])
     def output_img(self, seg):
         config = self.config
+        oc = config.out_center
         ow, oh = config.out_size
         owp = ow - config.margin * 2
         ohp = oh - config.margin * 2
@@ -219,8 +220,14 @@ class SimpleAssembler(object):
                 nh = ohp
                 nw = nround(float(iw) / ih * nh)
             img = img.resize((nw, nh), Image.ANTIALIAS)
+            iw, ih = img.size
+        if oc:
+            oleft = (ow - iw) / 2
+            otop = (oh - ih) / 2
+        else:
+            oleft, otop = (config.margin, config.margin)
         opimg = self.img.copy()
-        opimg.paste(img, (config.margin, config.margin))
+        opimg.paste(img, (oleft, otop))
         page = seg.get_page()
         opimg_ref = PageImageRef(page.page_no, 0, opimg)
         return opimg_ref

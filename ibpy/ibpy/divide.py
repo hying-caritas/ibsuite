@@ -821,6 +821,33 @@ class BasicPage(object):
 class Page(BasicPage):
     def __init__(self, doc, page_no):
         BasicPage.__init__(self, doc, page_no)
+    def hl_crop_parser(self):
+        if len(self.lines) == 0:
+            return
+        assert(len(self.lines) == 1)
+        avg_bbox = self.doc.avg_bbox
+        avg_width = avg_bbox[2] - avg_bbox[0]
+        avg_height = avg_bbox[3] - avg_bbox[1]
+        bbox = self.bbox
+        if bbox[2] - bbox[0] < 0.8 * avg_width:
+            if bbox[0] < avg_bbox[0]:
+                bbox[2] = bbox[0] + avg_width
+            elif bbox[2] > avg_bbox[2]:
+                bbox[0] = bbox[2] - avg_width
+            else:
+                bbox[0] = avg_bbox[0]
+                bbox[2] = avg_bbox[2]
+        if bbox[3] - bbox[1] < 0.8 * avg_height:
+            if bbox[1] < avg_bbox[1]:
+                bbox[3] = bbox[1] + avg_height
+            elif bbox[3] > avg_bbox[3]:
+                bbox[1] = bbox[3] - avg_height
+            else:
+                bbox[1] = avg_bbox[1]
+                bbox[3] = avg_bbox[3]
+        ln = self.lines[0]
+        ln.bbox = bbox[:]
+        self.set_space()
     def hl_parse(self):
         doc = self.doc
         self.mark_figure_by_height()
@@ -1195,6 +1222,7 @@ class Doc(object):
         self.flex_coeff = 1./12
         self.avg_rln_lft = 0
         self.stats = []
+        self.crop_stats = []
     def load_config(self, config):
         self.config = config
         self.divide = config.divide
@@ -1233,6 +1261,20 @@ class Doc(object):
         self.avg_rln_lft = middle(avg_rln_lfts)
         if self.config.flex_coeff is None:
             self.flex_coeff = min(3. / self.avg_cpl, 1.0 / 12)
+    def crop_stat_page(self, page):
+        bbox = page.bbox;
+        self.crop_stats.append(bbox)
+    def end_crop_stat(self):
+        heights = [bbox[3] - bbox[1] for bbox in self.crop_stats]
+        widths = [bbox[2] - bbox[0] for bbox in self.crop_stats]
+        tops = [bbox[1] for bbox in self.crop_stats]
+        lefts = [bbox[0] for bbox in self.crop_stats]
+        avg_height = middle(heights)
+        avg_width = middle(widths)
+        avg_top = middle(tops)
+        avg_left = middle(lefts)
+        self.avg_bbox = [avg_left, avg_top, avg_left + avg_width,
+                         avg_top + avg_height]
 
 class PageParser(object):
     def __init__(self, config):
@@ -1271,6 +1313,8 @@ class PageHLParser(object):
     def __init__(self, config):
         object.__init__(self)
         self.doc = None
+    def need_train(self):
+        return True
     def set_doc(self, page):
         if self.doc is None:
             self.doc = page.doc
@@ -1285,9 +1329,29 @@ class PageHLParser(object):
     def end_train(self):
         self.doc.end_stat()
 
+class CropHLParser(object):
+    def __init__(self, config):
+        object.__init__(self)
+        self.doc = None
+    def need_train(self):
+        return True
+    def set_doc(self, page):
+        if self.doc is None:
+            self.doc = page.doc
+    def hl_parse(self, page):
+        page.hl_crop_parser()
+        return page
+    def train(self, page):
+        self.set_doc(page)
+        self.doc.crop_stat_page(page)
+    def end_train(self):
+        self.doc.end_crop_stat()
+
 class NullPageHLParser(object):
     def __init__(self, config):
         object.__init__(self)
+    def need_train(self):
+        return False
     def hl_parse(self, page):
         return page
     def train(self, page):
@@ -1296,6 +1360,8 @@ class NullPageHLParser(object):
         pass
 
 def create_page_hl_parser(config):
+    if config.page_hl_parser == 'crop':
+        return CropHLParser(config)
     if config.divide > 1:
         return PageHLParser(config)
     else:

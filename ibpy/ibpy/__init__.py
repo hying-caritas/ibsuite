@@ -60,7 +60,7 @@ def __reformat(args):
     collector = image.Collector(conf)
     gen = generator.create_generator(conf)
 
-    if conf.divide > 1:
+    if page_hl_parser.need_train():
         page_hl_parser_train()
 
     for pn in range(conf.first_page, conf.last_page+1):
