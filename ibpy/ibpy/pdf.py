@@ -39,6 +39,7 @@ class PDFImage(object):
         object.__init__(self)
         self.pdf_fn = config.input_fn
         self.output_prefix = config.output_prefix
+        self.input_img_negate = config.input_img_negate
         self.tmpd = '%s/pdfimage' % (config.tmp_dir,)
         makedirs(self.tmpd)
         self.output_prefix = '%s/out' % (self.tmpd,)
@@ -54,7 +55,7 @@ class PDFImage(object):
         assert(len(out_fns) == 1)
         out_fn = out_fns[0]
         cmdline = ['convert', '-depth', '8']
-        if out_fn.endswith('pbm'):
+        if self.input_img_negate:
             cmdline.append('-negate')
         cmdline.extend([out_fns[0], img_fn])
         check_call(cmdline)
