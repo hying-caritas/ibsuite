@@ -1,4 +1,5 @@
 PREFIX = /usr/local
+DESTDIR = /
 
 all:
 	./build.sh xulapp
