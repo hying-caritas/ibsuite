@@ -95,6 +95,84 @@ class Unpaper(object):
                     pimg_ref.get_file_name(), out_file_name])
         return pimg_ref.derive(file_name = out_file_name)
 
+class RowCondense(object):
+    def __init__(self, config):
+        object.__init__(self)
+    def convert(self, pimg_ref, out_file_name = None):
+        img = pimg_ref.get_image()
+        iw, ih = img.size
+        ethr = max(ih/500, 1)
+
+        def not_empty(h):
+            return sum(h[:-32]) > ethr
+
+        top = 0
+        bottom = ih
+        left = -1
+        right = iw
+
+        for x in range(1, iw+1):
+            ir = img.crop((x - 1, 0, x, ih))
+            if not_empty(ir.histogram()):
+                left = x - 1
+                break
+        if left == -1:
+            nimg = img.crop((0, 0, 2, ih))
+            return pimg_ref.derive(nimg)
+
+        for x in range(left, iw-1, -1):
+            ir = img.crop((x, 0, x+1, ih))
+            if not_empty(ir.histogram()):
+                right = x+1
+                break
+
+        rows = []
+        pe = True
+        for y in range(1, ih+1):
+            ic = img.crop((left, y-1, right, y))
+            ce = not not_empty(ic.histogram())
+            if pe != ce:
+                rows.append(y-1)
+                pe = ce
+        if not pe:
+            rows.append(ih)
+        if len(rows) == 0:
+            nimg = img.crop((0, 0, 2, ih))
+            return pimg_ref.derive(nimg)
+
+        minh_empty = max(ih / 100, 5)
+        for i in range(len(rows)-3, 1, -2):
+            if rows[i+1] - rows[i] < minh_empty:
+                del rows[i+1]
+                del rows[i]
+        minh_ink = max(ih / 100, 5)
+        nh = 0
+        for i in range(0, len(rows) - 2, 2):
+            inkh = rows[i+1] - rows[i]
+            ninkh = rows[i+3] - rows[i+2]
+            nh = nh + inkh
+            if inkh < minh_ink or ninkh < minh_ink:
+                nh = nh + minh_empty
+            else:
+                nh = nh + rows[i+2] - rows[i+1]
+        nh += rows[-1] - rows[-2]
+        nw = right - left
+        nimg = Image.new("L", (nw, nh))
+        cy = 0
+        for i in range(0, len(rows) - 2, 2):
+            inkh = rows[i+1] - rows[i]
+            ninkh = rows[i+3] - rows[i+2]
+            nimg.paste(img.crop((left, rows[i], right, rows[i+1])), (0, cy))
+            cy = cy + inkh
+            if inkh < minh_ink or ninkh < minh_ink:
+                eh = minh_empty
+            else:
+                eh = rows[i+2] - rows[i+1]
+            nimg.paste(255, (0, cy, nw, cy + eh))
+            cy = cy + eh
+        nimg.paste(img.crop((left, rows[-2], right, rows[-1])), (0, cy))
+        return pimg_ref.derive(nimg)
+
 class ColumnCondense(object):
     def __init__(self, config):
         object.__init__(self)
@@ -175,9 +253,22 @@ class ColumnCondense(object):
                    (cx, 0))
         return pimg_ref.derive(nimg)
 
+class RowColumnCondense(object):
+    def __init__(self, config):
+        object.__init__(self)
+        self.rc = RowCondense(config)
+        self.cc = ColumnCondense(config)
+    def convert(self, pimg_ref, out_file_name = None):
+        pimg_ref = self.cc.convert(pimg_ref)
+        return self.rc.convert(pimg_ref)
+
 def create_unpaper(config):
     if config.unpaper == 'cc':
         return ColumnCondense(config)
+    elif config.unpaper == 'rc':
+        return RowCondense(config)
+    elif config.unpaper == 'rcc':
+        return RowColumnCondense(config)
     elif config.unpaper == 'up':
         return Unpaper(config)
     else:
