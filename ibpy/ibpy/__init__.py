@@ -37,7 +37,8 @@ def __reformat(args):
         for i in range(nsample):
             pn= random.randint(conf.first_page, conf.last_page)
             pimg_ref = inputtoppm.get_image(pn)
-            pimg_ref = precrop.convert(pimg_ref)
+            if not conf.no_pre_crop:
+                pimg_ref = precrop.convert(pimg_ref)
             pimg_ref = unpaper.convert(pimg_ref)
             page = page_parser.parse(pimg_ref)
             page_hl_parser.train(page)
@@ -68,7 +69,8 @@ def __reformat(args):
 
         last = (pn == conf.last_page)
         pimg_ref = inputtoppm.get_image(pn)
-        pimg_ref = precrop.convert(pimg_ref)
+        if not conf.no_pre_crop:
+            pimg_ref = precrop.convert(pimg_ref)
         pimg_ref = unpaper.convert(pimg_ref)
         dilate_pimg_ref = dilate.convert(pimg_ref)
             
