@@ -700,6 +700,8 @@ class BasicPage(object):
         return norm * self.img.size[0]
     def render(self, pimg_ref):
         self.img = pimg_ref.get_image()
+        if self.doc.out_size_in:
+            self.out_size = self.img.size
         iw, ih = self.img.size
         sw = self.norm2opxl(self.image_width())
         sh = self.norm2opxl(self.image_height())
@@ -1237,6 +1239,7 @@ class Doc(object):
         self.merge_center = config.merge_center
         self.merge_sparse = config.merge_sparse
         self.opedge_ex = config.opedge_ex
+        self.out_size_in = config.out_size_in
     def add_text_format(self, tf):
         self.text_formats.append(tf)
     def find_text_format(self, ln):

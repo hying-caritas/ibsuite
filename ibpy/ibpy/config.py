@@ -151,6 +151,7 @@ config_options = {
     'crop' : (str2bool, False, None, 'Crop the result'),
     'debug' : (str2bool, False, None, "Debug mode"),
     'dynamic_out_size' : (str2bool, False, None, 'Output size is not fixed'),
+    'out_size_in' : (str2bool, False, None, 'Output size is follow in size'),
 }
 
 def setup_option_parser(parser):
@@ -287,6 +288,14 @@ class Config(object):
                 self.opedge_ex = 2
             else:
                 self.opedge_ex = 0
+
+        if self.out_size_in:
+            if self.assembler != 'crop':
+                print 'out_size_in mode only can works with crop assembler'
+                sys.exit(-1)
+
+        if self.assembler == 'crop':
+            self.dynamic_out_size = True
 
         global debug
         if self.debug:
