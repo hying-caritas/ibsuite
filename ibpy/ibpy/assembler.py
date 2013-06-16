@@ -255,7 +255,17 @@ class CropAssembler(object):
         config = self.config
         img = seg.get_img(0, seg.pheight())
         page = seg.get_page()
-        opimg_ref = PageImageRef(page.page_no, 0, img.copy())
+        iw, ih = img.size
+        ow, oh = page.out_size
+        mow, moh = ow/3, oh/3
+        if ow < mow or oh < moh:
+            nimg = Image.new("L", (mow, moh))
+            nimg.paste(255, [0, 0, (mow, moh)])
+            nimg.paste(img, (0, 0))
+            img = nimg
+        else:
+            img = img.copy()
+        opimg_ref = PageImageRef(page.page_no, 0, img)
         return opimg_ref
     def assemble(self, segs):
         opimg_refs = []
