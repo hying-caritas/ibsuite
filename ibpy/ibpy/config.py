@@ -165,7 +165,6 @@ config_options = {
     'dynamic_out_size' : (str2bool, False, None, 'Output size is not fixed'),
     'out_size_in' : (str2bool, False, None, 'Output size is follow in size'),
     'right_align' : (str2bool, False, None, 'Right align output'),
-    'no_pre_crop' : (str2bool, False, None, 'No precrop processing'),
     'unpaper_keep_size' : (str2bool, False, None, 'do not change image size during unpaper'),
 }
 
@@ -280,7 +279,6 @@ class Config(object):
         if self.assembler == 'crop':
             self.dynamic_out_size = True
         if self.out_size_in:
-            self.no_pre_crop = True
             self.unpaper_keep_size = True
     def check(self):
         self.out_size = (self.out_width, self.out_height)
