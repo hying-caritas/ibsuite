@@ -10,6 +10,7 @@
 import os.path
 import re
 import Image
+import shutil
 
 from image import PageImageRef
 from util import *
