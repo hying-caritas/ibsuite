@@ -312,7 +312,7 @@ class Config(object):
                 print 'out_size_in mode only can works with crop assembler'
                 sys.exit(-1)
 
-        if self.right_align and self.assembleer != 'crop':
+        if self.right_align and self.assembler != 'crop':
             print 'right_align mode only works with crop assembler'
             sys.exit(-1)
 
