@@ -44,6 +44,7 @@ class PDFImage(object):
         makedirs(self.tmpd)
         self.output_prefix = '%s/out' % (self.tmpd,)
         self.re_out_fn = re.compile('%s-0*\\.(ppm|pbm)' % (self.output_prefix,))
+        self.pdf_to_ppm = PDFToPPM(config)
     def get_image(self, page_num):
         spage_num = '%d' % (page_num,)
         check_call(['pdfimages', '-f', spage_num, '-l', spage_num,
@@ -52,7 +53,11 @@ class PDFImage(object):
         fns = os.listdir(self.tmpd)
         fns = [os.path.join(self.tmpd, fn) for fn in fns]
         out_fns = [fn for fn in fns if self.re_out_fn.match(fn)]
-        assert(len(out_fns) == 1)
+        nout_fns = len(out_fns)
+        if nout_fns != 1:
+            print 'PDFImage.get_image: %d images generated for page %d' % \
+                (nout_fns, page_num)
+            return self.pdf_to_ppm.get_image(page_num)
         out_fn = out_fns[0]
         cmdline = ['convert', '-depth', '8']
         if self.input_img_negate:
