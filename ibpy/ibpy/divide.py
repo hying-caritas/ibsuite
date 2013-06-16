@@ -71,7 +71,7 @@ class Seg(object):
         ebbox[3] = min(ebbox[3] + edge_ex, page.image_height())
 
         ow_norm = page.width_after_divide()
-        oh_norm = page.opxl2norm(doc.out_size[1] - 2*doc.margin - \
+        oh_norm = page.opxl2norm(page.out_size[1] - 2*doc.margin - \
                                      2*opedge_ex - 1)
         cw = ebbox[2] - ebbox[0]
         ch = ebbox[3] - ebbox[1]
@@ -647,6 +647,7 @@ class BasicPage(object):
         self.page_no = page_no
         self.opxl2norm_coeff = None
         self.norm2opxl_coeff = None
+        self.out_size = doc.out_size_set
     def width(self):
         return max(self.bbox[2] - self.bbox[0], 0.333)
     def height(self):
@@ -670,7 +671,7 @@ class BasicPage(object):
         if self.opxl2norm_coeff is None:
             npw = self.width_after_divide()
             doc = self.doc
-            ow = doc.out_size[0] - 2 * doc.margin - 2 * doc.opedge_ex
+            ow = self.out_size[0] - 2 * doc.margin - 2 * doc.opedge_ex
             if hasattr(self, "img"):
                 iw = self.norm2rpxl(npw)
             else:
@@ -683,7 +684,7 @@ class BasicPage(object):
         if self.norm2opxl_coeff is None:
             npw = self.width_after_divide()
             doc = self.doc
-            ow = doc.out_size[0] - 2 * doc.margin - 2 * doc.opedge_ex
+            ow = self.out_size[0] - 2 * doc.margin - 2 * doc.opedge_ex
             if hasattr(self, "img"):
                 iw = self.norm2rpxl(npw)
             else:
@@ -1227,7 +1228,7 @@ class Doc(object):
         self.config = config
         self.divide = config.divide
         self.margin = config.margin
-        self.out_size = config.out_size
+        self.out_size_set = config.out_size
         self.max_il_coeff = config.max_il_coeff
         if config.flex_coeff is not None:
             self.flex_coeff = config.flex_coeff
