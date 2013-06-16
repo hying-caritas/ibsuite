@@ -124,7 +124,6 @@ config_options = {
     'pprof' : (str, None, None, 'Processing profile'),
     'input_format' : (str, None, None, 'Input format'),
     'input_type' : (str, 'graph', None, 'Input type'),
-    'input_img_negate' : (str2bool, True, None, 'Negate input image'),
     'divide' : (int, 1, '-d', 'How many segment to divide one line'),
     'margin' : (int, 0, None, 'Output margin'),
     'out_width' : (int, 584, '-w', 'Output width'),

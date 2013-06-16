@@ -9,6 +9,7 @@
 
 import os.path
 import re
+import Image
 
 from image import PageImageRef
 from util import *
@@ -39,7 +40,6 @@ class PDFImage(object):
         object.__init__(self)
         self.pdf_fn = config.input_fn
         self.output_prefix = config.output_prefix
-        self.input_img_negate = config.input_img_negate
         self.tmpd = '%s/pdfimage' % (config.tmp_dir,)
         makedirs(self.tmpd)
         self.output_prefix = '%s/out' % (self.tmpd,)
@@ -60,8 +60,14 @@ class PDFImage(object):
             return self.pdf_to_ppm.get_image(page_num)
         out_fn = out_fns[0]
         cmdline = ['convert', '-depth', '8']
-        if self.input_img_negate:
-            cmdline.append('-negate')
+        img = Image.open(out_fn)
+        h = img.histogram()
+        if len(h) == 256:
+            if sum(h[:32]) < img.size[0] * img.size[1] / 2:
+                shutil.move(out_fn, img_fn)
+                return PageImageRef(page_num, image = img, file_name = img_fn)
+            else:
+                cmdline.append('-negate')
         cmdline.extend([out_fns[0], img_fn])
         check_call(cmdline)
         os.unlink(out_fns[0])
