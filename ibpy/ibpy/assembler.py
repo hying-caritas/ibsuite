@@ -262,7 +262,7 @@ class CropAssembler(object):
             mow = max(mow, iw)
             moh = max(moh, ih)
             nimg = Image.new("L", (mow, moh))
-            nimg.paste(255, [0, 0, (mow, moh)])
+            nimg.paste(255, [0, 0, mow, moh])
             if self.right_align:
                 oleft = mow - iw
             else:
