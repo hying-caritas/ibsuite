@@ -702,7 +702,7 @@ class BasicPage(object):
         iw, ih = self.img.size
         sw = self.norm2opxl(self.image_width())
         sh = self.norm2opxl(self.image_height())
-        if abs(iw - sw) < 0.1 and abs(ih - sh) < 0.1:
+        if abs(iw - sw) < 0.1 * iw and abs(ih - sh) / ih < 0.1 * ih:
             self.scaled_img = self.img
         else:
             sw = nround(sw)
