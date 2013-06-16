@@ -258,7 +258,9 @@ class CropAssembler(object):
         iw, ih = img.size
         ow, oh = page.out_size
         mow, moh = ow/3, oh/3
-        if ow < mow or oh < moh:
+        if iw < mow or ih < moh:
+            mow = max(mow, iw)
+            moh = max(moh, ih)
             nimg = Image.new("L", (mow, moh))
             nimg.paste(255, [0, 0, (mow, moh)])
             if self.right_align:
