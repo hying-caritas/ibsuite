@@ -91,6 +91,17 @@ iprof_img = {
     'input_type' : 'image',
 }
 
+pprof_img_crop = {
+    'divide' : True,
+    'page_parser' : 'simple',
+    'assembler' : 'crop',
+    'dilate' : False,
+    'unpaper' : 'rcc',
+    'input_type' : 'image',
+    'out_size_in' : True,
+    'dynamic_out_size' : True,
+}
+
 profiles = {
     'prs505p' : oprof_prs505p,
     'prs505l' : oprof_prs505l,
@@ -100,6 +111,7 @@ profiles = {
     'resize' : pprof_resize,
     'repage' : pprof_repage,
     'crop' : pprof_crop,
+    'img_crop' : pprof_img_crop,
     'img' : iprof_img,
 }
 
