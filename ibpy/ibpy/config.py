@@ -277,6 +277,11 @@ class Config(object):
                 self.bookmarks = bms
             if not hasattr(self, 'last_page'):
                 self.last_page = meta.pages
+        if self.assembler == 'crop':
+            self.dynamic_out_size = True
+        if self.out_size_in:
+            self.no_pre_crop = True
+            self.unpaper_keep_size = True
     def check(self):
         self.out_size = (self.out_width, self.out_height)
         if self.input_fn is None:
@@ -308,9 +313,6 @@ class Config(object):
             if self.assembler != 'crop':
                 print 'out_size_in mode only can works with crop assembler'
                 sys.exit(-1)
-
-        if self.assembler == 'crop':
-            self.dynamic_out_size = True
 
         if self.right_align and self.assembleer != 'crop':
             print 'right_align mode only works with crop assembler'
