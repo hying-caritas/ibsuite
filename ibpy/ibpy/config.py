@@ -164,6 +164,7 @@ config_options = {
     'debug' : (str2bool, False, None, "Debug mode"),
     'dynamic_out_size' : (str2bool, False, None, 'Output size is not fixed'),
     'out_size_in' : (str2bool, False, None, 'Output size is follow in size'),
+    'right_align' : (str2bool, False, None, 'Right align output'),
 }
 
 def setup_option_parser(parser):
@@ -308,6 +309,10 @@ class Config(object):
 
         if self.assembler == 'crop':
             self.dynamic_out_size = True
+
+        if self.right_align and self.assembleer != 'crop':
+            print 'right_align mode only works with crop assembler'
+            sys.exit(-1)
 
         global debug
         if self.debug:

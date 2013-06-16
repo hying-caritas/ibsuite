@@ -248,11 +248,11 @@ class CropAssembler(object):
         self.draw = ImageDraw.Draw(self.img)
         self.fill_img()
         self.segs = []
+        self.right_align = config.right_align
     def fill_img(self):
         ow, oh = self.img.size
         self.img.paste(255, [0, 0, ow, oh])
     def output_img(self, seg):
-        config = self.config
         img = seg.get_img(0, seg.pheight())
         page = seg.get_page()
         iw, ih = img.size
@@ -261,7 +261,11 @@ class CropAssembler(object):
         if ow < mow or oh < moh:
             nimg = Image.new("L", (mow, moh))
             nimg.paste(255, [0, 0, (mow, moh)])
-            nimg.paste(img, (0, 0))
+            if self.right_align:
+                oleft = mow - iw
+            else:
+                oleft = 0
+            nimg.paste(img, (oleft, 0))
             img = nimg
         else:
             img = img.copy()
