@@ -249,6 +249,8 @@ class CropAssembler(object):
         self.fill_img()
         self.segs = []
         self.right_align = config.right_align
+        self.min_out_width_in = config.min_out_width_in
+        self.min_out_height_in = config.min_out_height_in
     def fill_img(self):
         ow, oh = self.img.size
         self.img.paste(255, [0, 0, ow, oh])
@@ -257,7 +259,8 @@ class CropAssembler(object):
         page = seg.get_page()
         iw, ih = img.size
         ow, oh = page.out_size
-        mow, moh = ow/3, oh/3
+        mow = nround(ow * self.min_out_width_in)
+        moh = nround(oh * self.min_out_height_in)
         if iw < mow or ih < moh:
             mow = max(mow, iw)
             moh = max(moh, ih)

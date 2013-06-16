@@ -165,6 +165,8 @@ config_options = {
     'out_size_in' : (str2bool, False, None, 'Output size is follow in size'),
     'right_align' : (str2bool, False, None, 'Right align output'),
     'unpaper_keep_size' : (str2bool, False, None, 'do not change image size during unpaper'),
+    'min_out_width_in': (float, 0.4, None, 'minimal output width when following in size'),
+    'min_out_height_in': (float, 0.6, None, 'minimal output height when following in size'),
 }
 
 def setup_option_parser(parser):
