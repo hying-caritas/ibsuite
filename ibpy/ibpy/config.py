@@ -166,6 +166,7 @@ config_options = {
     'out_size_in' : (str2bool, False, None, 'Output size is follow in size'),
     'right_align' : (str2bool, False, None, 'Right align output'),
     'no_pre_crop' : (str2bool, False, None, 'No precrop processing'),
+    'unpaper_keep_size' : (str2bool, False, None, 'do not change image size during unpaper'),
 }
 
 def setup_option_parser(parser):

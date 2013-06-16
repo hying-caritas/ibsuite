@@ -98,6 +98,7 @@ class Unpaper(object):
 class RowCondense(object):
     def __init__(self, config):
         object.__init__(self)
+        self.unpaper_keep_size = config.unpaper_keep_size
     def convert(self, pimg_ref, out_file_name = None):
         img = pimg_ref.get_image()
         iw, ih = img.size
@@ -157,7 +158,12 @@ class RowCondense(object):
                 nh = nh + rows[i+2] - rows[i+1]
         nh += rows[-1] - rows[-2]
         nw = right - left
-        nimg = Image.new("L", (nw, nh))
+        if self.unpaper_keep_size:
+            nw, nh = iw, ih
+            nimg = Image.new("L", (nw, nh))
+            nimg.paste(255, [0, 0, nw, nh])
+        else:
+            nimg = Image.new("L", (nw, nh))
         cy = 0
         for i in range(0, len(rows) - 2, 2):
             inkh = rows[i+1] - rows[i]
@@ -176,6 +182,7 @@ class RowCondense(object):
 class ColumnCondense(object):
     def __init__(self, config):
         object.__init__(self)
+        self.unpaper_keep_size = config.unpaper_keep_size
     def convert(self, pimg_ref, out_file_name = None):
         img = pimg_ref.get_image()
         iw, ih = img.size
@@ -235,7 +242,12 @@ class ColumnCondense(object):
                 nw = nw + cols[i+2] - cols[i+1]
         nw += cols[-1] - cols[-2]
         nh = bottom - top
-        nimg = Image.new("L", (nw, nh))
+        if self.unpaper_keep_size:
+            nw, nh = iw, ih
+            nimg = Image.new("L", (nw, nh))
+            nimg.paste(255, [0, 0, nw, nh])
+        else:
+            nimg = Image.new("L", (nw, nh))
         cx = 0
         for i in range(0, len(cols) - 2, 2):
             inkw = cols[i+1] - cols[i]
