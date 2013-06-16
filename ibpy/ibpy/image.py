@@ -118,7 +118,10 @@ class RowCondense(object):
                 left = x - 1
                 break
         if left == -1:
-            nimg = img.crop((0, 0, 2, ih))
+            if self.unpaper_keep_size:
+                nimg = img
+            else:
+                nimg = img.crop((0, 0, 2, ih))
             return pimg_ref.derive(nimg)
 
         for x in range(left, iw-1, -1):
@@ -138,7 +141,10 @@ class RowCondense(object):
         if not pe:
             rows.append(ih)
         if len(rows) == 0:
-            nimg = img.crop((0, 0, 2, ih))
+            if self.unpaper_keep_size:
+                nimg = img
+            else:
+                nimg = img.crop((0, 0, 2, ih))
             return pimg_ref.derive(nimg)
 
         minh_empty = max(ih / 100, 5)
@@ -202,7 +208,10 @@ class ColumnCondense(object):
                 top = y - 1
                 break
         if top == -1:
-            nimg = img.crop((0, 0, iw, 2))
+            if self.unpaper_keep_size:
+                nimg = img
+            else:
+                nimg = img.crop((0, 0, iw, 2))
             return pimg_ref.derive(nimg)
 
         for y in range(ih-1, top, -1):
@@ -222,7 +231,10 @@ class ColumnCondense(object):
         if not pe:
             cols.append(iw)
         if len(cols) == 0:
-            nimg = img.crop((0, 0, iw, 2))
+            if self.unpaper_keep_size:
+                nimg = img
+            else:
+                nimg = img.crop((0, 0, iw, 2))
             return pimg_ref.derive(nimg)
 
         minw_empty = max(iw / 100, 5)
