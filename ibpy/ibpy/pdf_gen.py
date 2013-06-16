@@ -7,6 +7,7 @@
 # (at your option) any later version.
 #
 
+import Image
 from reportlab.pdfgen import canvas
 
 class PDFGenerator(object):
@@ -18,6 +19,7 @@ class PDFGenerator(object):
         self.title = config.title
         self.author = config.author
         self.bookmarks = config.bookmarks
+        self.dynamic_out_size = config.dynamic_out_size
     def generate(self, img_files, page_map = None):
         def map_page_num(pm, pn):
             if pm is None:
@@ -44,6 +46,9 @@ class PDFGenerator(object):
         c.setAuthor(self.author)
         p2bm = gen_page_to_bm_map(self.bookmarks, page_map)
         for opn, fn in enumerate(img_files):
+            if self.dynamic_out_size:
+                img = Image.open(fn)
+                c.setPageSize(img.size)
             c.drawImage(fn, 0, 0)
             if p2bm.has_key(opn):
                 for n, t in enumerate(p2bm[opn]):

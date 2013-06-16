@@ -240,8 +240,36 @@ class SimpleAssembler(object):
     def end(self):
         return []
 
+class CropAssembler(object):
+    def __init__(self, config):
+        object.__init__(self)
+        self.config = config
+        self.img = Image.new("L", config.out_size)
+        self.draw = ImageDraw.Draw(self.img)
+        self.fill_img()
+        self.segs = []
+    def fill_img(self):
+        ow, oh = self.img.size
+        self.img.paste(255, [0, 0, ow, oh])
+    def output_img(self, seg):
+        config = self.config
+        img = seg.get_img(0, seg.pheight())
+        page = seg.get_page()
+        opimg_ref = PageImageRef(page.page_no, 0, img.copy())
+        return opimg_ref
+    def assemble(self, segs):
+        opimg_refs = []
+        for seg in segs:
+            opimg_ref = self.output_img(seg)
+            opimg_refs.append(opimg_ref)
+        return opimg_refs
+    def end(self):
+        return []
+
 def create_assembler(config):
     if config.assembler == 'simple':
         return SimpleAssembler(config)
+    elif config.assembler == 'crop':
+        return CropAssembler(config)
     else:
         return Assembler(config)

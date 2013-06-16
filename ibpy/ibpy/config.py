@@ -150,6 +150,7 @@ config_options = {
     'last_page' : (int, None, "-l", 'Last page'),
     'crop' : (str2bool, False, None, 'Crop the result'),
     'debug' : (str2bool, False, None, "Debug mode"),
+    'dynamic_out_size' : (str2bool, False, None, 'Output size is not fixed'),
 }
 
 def setup_option_parser(parser):
