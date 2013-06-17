@@ -6,7 +6,7 @@ OS := $(shell echo ${OS} | tr / _)
 MACH = $(shell uname -m)
 
 all:
-ifndef NO_XUL
+ifdef XUL
 	${MAKE} -C ibhtml2pdf
 	${MAKE} -C ibhtml2img
 endif
@@ -29,7 +29,7 @@ distclean:
 	rm -f *~
 
 INSTALL_MOD := iblineparser ibtools ibpy
-ifndef NO_XUL
+ifdef XUL
 INSTALL_MOD := ${INSTALL_MOD} ibhtml2pdf ibhtml2img
 endif
 
