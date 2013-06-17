@@ -148,7 +148,7 @@ config_options = {
     'opedge_ex' : (float, None, None, 'output page edge expanded'),
     'page_parser' : (str, None, None, "Page parser"),
     'page_hl_parser' : (str, None, None, "High-level page parser"),
-    'assembler' : (str, None, None, "Assembler"),
+    'assembler' : (str, '', None, "Assembler"),
     'colors' : (int, 4, None, 'Color number for output image'),
     'rotate' : (str2bool, False, None, 'Rotate output image'),
     'gamma' : (float, 0, None, 'Level of gamma correction'),
@@ -176,9 +176,11 @@ def setup_option_parser(parser):
         desc = config_options[k]
         conv, default, short, help = desc
         if short:
-            parser.add_option(short, '--' + k, dest=k, help = help)
+            parser.add_option(short, '--' + k, dest=k,
+                              default = default, help = help)
         else:
-            parser.add_option('--' + k, dest=k, help = help)
+            parser.add_option('--' + k, dest=k,
+                              default = default, help = help)
 
 def cleanup_options(options):
     for k in dir(options):
