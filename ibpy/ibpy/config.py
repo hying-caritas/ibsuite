@@ -176,11 +176,9 @@ def setup_option_parser(parser):
         desc = config_options[k]
         conv, default, short, help = desc
         if short:
-            parser.add_option(short, '--' + k, dest=k,
-                              default = default, help = help)
+            parser.add_option(short, '--' + k, dest=k, help = help)
         else:
-            parser.add_option('--' + k, dest=k,
-                              default = default, help = help)
+            parser.add_option('--' + k, dest=k, help = help)
 
 def cleanup_options(options):
     for k in dir(options):
@@ -281,8 +279,6 @@ class Config(object):
                 self.last_page = meta.pages
         if self.assembler == 'crop':
             self.dynamic_out_size = True
-        if self.out_size_in:
-            self.unpaper_keep_size = True
     def check(self):
         self.out_size = (self.out_width, self.out_height)
         if self.input_fn is None:
@@ -318,6 +314,9 @@ class Config(object):
         if self.right_align and self.assembler != 'crop':
             print 'right_align mode only works with crop assembler'
             sys.exit(-1)
+
+        if self.out_size_in:
+            self.unpaper_keep_size = True
 
         global debug
         if self.debug:
