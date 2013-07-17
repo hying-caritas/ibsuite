@@ -7,6 +7,7 @@
 # (at your option) any later version.
 #
 
+import os
 import os.path
 import re
 import Image
@@ -44,7 +45,7 @@ class PDFImage(object):
         self.tmpd = '%s/pdfimage' % (config.tmp_dir,)
         makedirs(self.tmpd)
         self.output_prefix = '%s/out' % (self.tmpd,)
-        self.re_out_fn = re.compile('%s-0*\\.(ppm|pbm)' % (self.output_prefix,))
+        self.re_out_fn = re.compile('%s-0[0-9]*\\.(ppm|pbm)' % (self.output_prefix,))
         self.pdf_to_ppm = PDFToPPM(config)
     def get_image(self, page_num):
         spage_num = '%d' % (page_num,)
@@ -58,6 +59,8 @@ class PDFImage(object):
         if nout_fns != 1:
             print 'PDFImage.get_image: %d images generated for page %d' % \
                 (nout_fns, page_num)
+            for fn in out_fns:
+                os.unlink(fn)
             return self.pdf_to_ppm.get_image(page_num)
         out_fn = out_fns[0]
         cmdline = ['convert', '-depth', '8']
